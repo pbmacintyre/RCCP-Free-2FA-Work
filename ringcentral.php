@@ -493,6 +493,12 @@ function RingCentral_2fa_intercept ($user, $username, $password) {
 
 function ringcentral_2fa_verify ($wpUser, $redirect_to, $remember_me) {
 
+    // Get the mobile number associated with the admin user
+    // 	    $to = get_user_meta( $wpUser->ID, 'RingCentral_2fa_user_mobile_number', true );
+    $to = "9029405827";
+    $phone_partial = substr($to, -4);
+
+    // the validation code form was submitted
     if (isset($_POST['RC_Validate_submit'])) {
         // 6 digit code was sent... and form was submitted with user response.
         // check that the sent validation code matches the session value
@@ -513,11 +519,6 @@ function ringcentral_2fa_verify ($wpUser, $redirect_to, $remember_me) {
 
         // add space in the code for readability before sending to SMS (optional)
         // $six_digit_code = substr($six_digit_code, 0, 3) . " " . substr($six_digit_code, 3, 3);
-
-        // Get the mobile number associated with the admin user
-        // 	    $to = get_user_meta( $wpUser->ID, 'RingCentral_2fa_user_mobile_number', true );
-        $to = "9029405827";
-        $phone_partial = substr($to, -4);
 
         // connect to SDK with credentials in the DB
         $sdk = ringcentral_sdk();
@@ -610,7 +611,7 @@ function ringcentral_2fa_verify ($wpUser, $redirect_to, $remember_me) {
                 </td>
             </tr>
             <input type="hidden" name="log" value="<?php echo esc_attr($wpUser->user_login) ?>">
-            <input type="hidden" name="pwd" value="<?php echo esc_attr($_POST['pwd']) ?>">
+            <input type="hidden" name="pwd" value="<?php echo esc_attr($wpUser->user_pass) ?>">
             <input type="hidden" name="ringcentral_post_token" value="<?php echo esc_attr($post_token) ?>"/>
             <input type="hidden" name="redirect_to" value="<?php echo esc_attr($redirect_to) ?>">
 
