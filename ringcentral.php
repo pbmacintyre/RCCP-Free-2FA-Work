@@ -510,9 +510,14 @@ function ringcentral_2fa_verify ($wpUser, $redirect_to, $remember_me, $errors = 
     // 	    $to = get_user_meta( $wpUser->ID, 'RingCentral_2fa_user_mobile_number', true );
     $to = "9029405827";
     $phone_partial = substr($to, -4);
-    $six_digit_code = rand(100000, 999999);
-    // put code in the session
-    $_SESSION['six_digit_code'] = $six_digit_code;
+    if ($_POST['first_time'] == "1") {
+        $six_digit_code = rand(100000, 999999);
+        // put code in the session
+        $_SESSION['six_digit_code'] = $six_digit_code;
+    } else {
+        // do nothing so far
+    }
+
     // add space in the code for readability before sending to SMS (optional)
     // $six_digit_code = substr($six_digit_code, 0, 3) . " " . substr($six_digit_code, 3, 3);
 
@@ -538,6 +543,9 @@ function ringcentral_2fa_verify ($wpUser, $redirect_to, $remember_me, $errors = 
 
     echo "</br>Session Object: <pre>";
     var_dump($_SESSION);
+    echo "</pre>";
+    echo "</br>Post Array: <pre>";
+    var_dump($_POST);
     echo "</pre>";
     ?>
 
@@ -606,6 +614,7 @@ function ringcentral_2fa_verify ($wpUser, $redirect_to, $remember_me, $errors = 
             <input type="hidden" name="log" value="<?php echo esc_attr($wpUser->user_login) ?>">
             <input type="hidden" name="ringcentral_post_token" value="<?php echo esc_attr($post_token) ?>"/>
             <input type="hidden" name="redirect_to" value="<?php echo esc_attr($redirect_to) ?>">
+            <input type="hidden" name="first_time" value="1">
 
             <?php if ($remember_me) : ?>
                 <input type="hidden" name="rememberme" value="forever"/>

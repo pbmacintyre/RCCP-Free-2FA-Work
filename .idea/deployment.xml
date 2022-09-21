@@ -6,7 +6,7 @@
       <paths name="Paladin Dev Server">
         <serverdata>
           <mappings>
-            <mapping deploy="/" local="$PROJECT_DIR$" web="/" />
+            <mapping deploy="/" local="$PROJECT_DIR$/../RCCP-Free-2FA-Work" web="/" />
           </mappings>
         </serverdata>
       </paths>
