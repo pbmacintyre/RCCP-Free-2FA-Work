@@ -464,10 +464,8 @@ function RingCentral_2fa_intercept ($user, $username, $password) {
     if (!session_id()) {
         session_start();
     }
-    //echo "</br>Session Object: <pre>";
-    //var_dump($_SESSION);
-    //echo "</pre>";
 
+    // should we test the password too ?
     $wpUser = get_user_by('login', $username);
 
     // check that the user is 2FA enabled in their user account data
@@ -475,56 +473,55 @@ function RingCentral_2fa_intercept ($user, $username, $password) {
     if (!$TwoFA_on) {
         return;
     }
-    $errors = [];
-    // same as isset($_POST['redirect_to'] ? sanitize_url($_POST['redirect_to']) : admin_url();
-    $redirect_to = sanitize_url($_POST['redirect_to']) ?? admin_url();
-    $session_token = isset($_SESSION['RingCentral_session_token']) ? sanitize_text_field($_SESSION['RingCentral_session_token']) : "";
-    $remember_me = isset($_POST['rememberme']) && $_POST['rememberme'] === 'forever';
 
-    $validation_code = isset($_POST['ringcentral_2fa_code']) ? sanitize_text_field($_POST['ringcentral_2fa_code']) : false;
+    $redirect_to = isset($_POST['redirect_to']) ? sanitize_url($_POST['redirect_to']) : admin_url();
+    $session_token = isset($_SESSION['RingCentral_session_token']) ? sanitize_text_field($_SESSION['RingCentral_session_token']) : "";
     $post_token = isset($_POST['ringcentral_post_token']) ? sanitize_text_field($_POST['ringcentral_post_token']) : false;
 
-    echo "Post token:" . $post_token . "</br>";
-    echo "Session Token:" . $session_token . "</br>";
-    echo "6 digit code from form submission:" . $validation_code . "</br>";
+    // will be used in the verify function to see a user login cookie TTD
+    $remember_me = isset($_POST['remember_me']) && $_POST['remember_me'] === 'forever';
 
-    // a 6 digit validation code was submitted
-    if ($post_token && $validation_code && $post_token === $session_token) {
-        // verify the validation code
-        if ($validation_code === $_SESSION['six_digit_code']) {
+    // check the form token to ensure the same process is trying to login
+    if ($post_token && $post_token === $session_token) {
+        // not sure if this is worth it
+    }
+    if ($wpUser) {
+        ringcentral_2fa_verify($wpUser, $redirect_to, $remember_me);
+    }
+    return $user;
+}
+
+function ringcentral_2fa_verify ($wpUser, $redirect_to, $remember_me) {
+
+    if (isset($_POST['RC_Validate_submit'])) {
+        // 6 digit code was sent... and form was submitted with user response.
+        // check that the sent validation code matches the session value
+        if ($_POST['ringcentral_2fa_code'] == $_SESSION['six_digit_code']) {
+            $errors = [];
             wp_set_auth_cookie($wpUser->ID, $remember_me);
             wp_safe_redirect($redirect_to);
             exit;
         } else {
             $errors[] = "Invalid Validation code";
         }
-    }
-    if ($wpUser) {
-        ringcentral_2fa_verify($wpUser, $redirect_to, $remember_me, $errors);
-    }
-    return $user;
-}
-
-function ringcentral_2fa_verify ($wpUser, $redirect_to, $remember_me, $errors = []) {
-    // Get the mobile number associated with the admin user
-    // 	    $to = get_user_meta( $wpUser->ID, 'RingCentral_2fa_user_mobile_number', true );
-    $to = "9029405827";
-    $phone_partial = substr($to, -4);
-    if ($_POST['first_time'] == "1") {
+    } else {
+        // this is the first time the form is being displayed (later in this function)
+        // so generate and send the code
         $six_digit_code = rand(100000, 999999);
         // put code in the session
         $_SESSION['six_digit_code'] = $six_digit_code;
-    } else {
-        // do nothing so far
-    }
 
-    // add space in the code for readability before sending to SMS (optional)
-    // $six_digit_code = substr($six_digit_code, 0, 3) . " " . substr($six_digit_code, 3, 3);
+        // add space in the code for readability before sending to SMS (optional)
+        // $six_digit_code = substr($six_digit_code, 0, 3) . " " . substr($six_digit_code, 3, 3);
 
-    // connect to SDK with credentials in the DB
-    $sdk = ringcentral_sdk();
+        // Get the mobile number associated with the admin user
+        // 	    $to = get_user_meta( $wpUser->ID, 'RingCentral_2fa_user_mobile_number', true );
+        $to = "9029405827";
+        $phone_partial = substr($to, -4);
 
-    $from = ringcentral_get_from_phone();
+        // connect to SDK with credentials in the DB
+        $sdk = ringcentral_sdk();
+        $from = ringcentral_get_from_phone();
 
 //    try {
 //        // echo "in try...";
@@ -540,15 +537,15 @@ function ringcentral_2fa_verify ($wpUser, $redirect_to, $remember_me, $errors = 
 //        // craft a friendly message here.
 //        $return_message = "There was an error sending the validation code, Please try again later <br/>" . $message;
 //    }
+    }
 
     echo "</br>Session Object: <pre>";
     var_dump($_SESSION);
     echo "</pre>";
-    echo "</br>Post Array: <pre>";
-    var_dump($_POST);
-    echo "</pre>";
+//    echo "</br>Post Array: <pre>";
+//    var_dump($_POST);
+//    echo "</pre>";
     ?>
-
     <style>
         <!--
         .RCValidate {
@@ -577,9 +574,10 @@ function ringcentral_2fa_verify ($wpUser, $redirect_to, $remember_me, $errors = 
 
     wp_logout();
     nocache_headers();
-    // header('Content-Type: ' . get_bloginfo('html_type') . '; charset=' . get_bloginfo('charset'));
+    header('Content-Type: ' . get_bloginfo('html_type') . '; charset=' . get_bloginfo('charset'));
     login_header('RingCentral', '<p class="message">' . sprintf('We have sent you a 6 digit 
-        validation code to the number we have on file ending in <strong>%1$s</strong>', $phone_partial) . '</p>');
+            validation code to the number we have on file ending in <strong>%1$s</strong>', $phone_partial) . '</p>');
+
     ?>
     <table class="RCValidate">
         <tr>
@@ -607,18 +605,18 @@ function ringcentral_2fa_verify ($wpUser, $redirect_to, $remember_me, $errors = 
             </tr>
             <tr>
                 <td>
-                    <input type="submit" name="submit" id="buttonControl" class="button button-primary button-large"
-                           value="Validate Code"/>
+                    <input type="submit" name="RC_Validate_submit" id="buttonControl"
+                           class="button button-primary button-large" value="Validate Code"/>
                 </td>
             </tr>
             <input type="hidden" name="log" value="<?php echo esc_attr($wpUser->user_login) ?>">
+            <input type="hidden" name="pwd" value="<?php echo esc_attr($_POST['pwd']) ?>">
             <input type="hidden" name="ringcentral_post_token" value="<?php echo esc_attr($post_token) ?>"/>
             <input type="hidden" name="redirect_to" value="<?php echo esc_attr($redirect_to) ?>">
-            <input type="hidden" name="first_time" value="1">
 
-            <?php if ($remember_me) : ?>
-                <input type="hidden" name="rememberme" value="forever"/>
-            <?php endif; ?>
+            <?php if ($remember_me) { ?>
+                <input type="hidden" name="remember_me" value="forever"/>
+            <?php } ?>
 
         </form>
     </table>
