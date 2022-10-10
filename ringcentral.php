@@ -494,8 +494,8 @@ function RingCentral_2fa_intercept ($user, $username, $password) {
 function ringcentral_2fa_verify ($wpUser, $redirect_to, $remember_me) {
 
     // Get the mobile number associated with the admin user
-    // 	    $to = get_user_meta( $wpUser->ID, 'RingCentral_2fa_user_mobile_number', true );
-    $to = "9029405827";
+    $to = get_user_meta($wpUser->ID, 'RingCentral_2fa_user_mobile', true);
+    //$to = "9029405827";
     $phone_partial = substr($to, -4);
 
     // the validation code form was submitted
@@ -524,46 +524,49 @@ function ringcentral_2fa_verify ($wpUser, $redirect_to, $remember_me) {
         $sdk = ringcentral_sdk();
         $from = ringcentral_get_from_phone();
 
-//    try {
-//        // echo "in try...";
-//        $apiResponse = $sdk->platform()->post('/account/~/extension/~/sms',
-//            array('from' => array('phoneNumber' => $from),
-//                'to' => array(array('phoneNumber' => $to)),
-//                'text' => "This is your validation code: " . $six_digit_code));
-//    }
-//    catch (\RingCentral\SDK\Http\ApiException $e) {
-//        // Getting error messages using PHP native interface
-//        $apiResponse = $e->apiResponse();
-//        $message = '  Message: ' . $e->apiResponse->response()->error() . PHP_EOL;
-//        // craft a friendly message here.
-//        $return_message = "There was an error sending the validation code, Please try again later <br/>" . $message;
-//    }
+        try {
+            // echo "in try...";
+            $apiResponse = $sdk->platform()->post('/account/~/extension/~/sms',
+                array('from' => array('phoneNumber' => $from),
+                    'to' => array(array('phoneNumber' => $to)),
+                    'text' => "This is your validation code: " . $six_digit_code));
+        }
+        catch (\RingCentral\SDK\Http\ApiException $e) {
+            // Getting error messages using PHP native interface
+            $apiResponse = $e->apiResponse();
+            $message = '  Message: ' . $e->apiResponse->response()->error() . PHP_EOL;
+            // craft a friendly message here.
+            $return_message = "There was an error sending the validation code, Please try again later <br/>" . $message;
+        }
     }
 
-    echo "</br>Session Object: <pre>";
-    var_dump($_SESSION);
-    echo "</pre>";
-//    echo "</br>Post Array: <pre>";
-//    var_dump($_POST);
+//    echo "</br>Session Object: <pre>";
+//    var_dump($_SESSION);
 //    echo "</pre>";
+
     ?>
     <style>
         <!--
-        .RCValidate {
-            margin-top: 3%;
-            margin-left: auto;
-            margin-right: auto;
-            /* border: 1px solid red; */
-        }
-        .RCValidate td {
-            text-align: center;
-        }
         #buttonControl {
             float: none !important;
         }
         #login_error {
             background-color: salmon !important;
             color: white;
+        }
+        .center_2fa {
+            /* border: #990000 solid 1px; */
+            text-align: center;
+        }
+        /* Chrome, Safari, Edge, Opera */
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        /* Firefox */
+        input[type=number] {
+            -moz-appearance: textfield;
         }
         -->
     </style>
@@ -580,48 +583,43 @@ function ringcentral_2fa_verify ($wpUser, $redirect_to, $remember_me) {
             validation code to the number we have on file ending in <strong>%1$s</strong>', $phone_partial) . '</p>');
 
     ?>
-    <table class="RCValidate">
-        <tr>
-            <td>
-                <h2 id='page_title'><?= "RingCentral 6 Digit Admin access Validation"; ?></h2>
-            </td>
-        </tr>
-        <tr>
-            <td>
-                <?php if (!empty($errors)) { ?>
-                    <div id="login_error"><?php echo esc_html(implode('<br />', $errors)) ?></div>
-                <?php } ?>
-            </td>
-        </tr>
+    <div class="center_2fa">
+        <h2 id='page_title'><?= "RingCentral 6 Digit Admin access Validation"; ?></h2>
+
+        <?php if (!empty($errors)) { ?>
+            <div id="login_error"><?php echo esc_html(implode('<br />', $errors)) ?></div>
+        <?php } ?>
+
         <form name="loginform" id="loginform"
               action="<?php echo esc_url(site_url('wp-login.php', 'login_post')) ?>"
               method="post" autocomplete="off">
-            <tr>
-                <td>
-                    <label for="ringcentral_2fa_code">Enter the validation code:
-                        </br> </br>
-                        <input type="text" name="ringcentral_2fa_code" value="" size="6"/>
-                    </label>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <input type="submit" name="RC_Validate_submit" id="buttonControl"
-                           class="button button-primary button-large" value="Validate Code"/>
-                </td>
-            </tr>
-            <input type="hidden" name="log" value="<?php echo esc_attr($wpUser->user_login) ?>">
-            <input type="hidden" name="pwd" value="<?php echo esc_attr($wpUser->user_pass) ?>">
-            <input type="hidden" name="ringcentral_post_token" value="<?php echo esc_attr($post_token) ?>"/>
-            <input type="hidden" name="redirect_to" value="<?php echo esc_attr($redirect_to) ?>">
 
-            <?php if ($remember_me) { ?>
-                <input type="hidden" name="remember_me" value="forever"/>
-            <?php } ?>
+            <p>
+                <label for="ringcentral_2fa_code">Enter the validation code:
+                    <br/> <br/>
+                    <input type="number" name="ringcentral_2fa_code" value="" size="6"/>
+                </label>
+            </p>
+            <br/>
+            <p>
+                <input type="submit" name="RC_Validate_submit" id="buttonControl"
+                       class="button button-primary button-large" value="Validate Code"/>
 
+                <input type="hidden" name="log" value="<?php echo esc_attr($wpUser->user_login) ?>">
+                <input type="hidden" name="ringcentral_post_token" value="<?php echo esc_attr($post_token) ?>"/>
+                <input type="hidden" name="redirect_to" value="<?php echo esc_attr($redirect_to) ?>">
+
+                <?php if ($remember_me) { ?>
+                    <input type="hidden" name="remember_me" value="forever"/>
+                <?php } ?>
+            </p>
         </form>
-    </table>
-<?php }
+        <?php
+        login_footer();
+        exit; ?>
+    </div>
+    <?php
+}
 
 add_action('authenticate', 'RingCentral_2fa_intercept', 10, 3);
 
