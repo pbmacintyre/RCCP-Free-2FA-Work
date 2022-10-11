@@ -1,8 +1,10 @@
 <?php
 /**
- * Copyright (C) 2019-2022 9 Paladin Business Solutions
+ * Copyright (C) 2019-2022 Paladin Business Solutions
  *
  */
+error_reporting(E_ALL);
+ini_set('display_errors', 0);
 
 function ringcentral_2fa_save_settings ($user_id) {
 
@@ -99,6 +101,39 @@ function ringcentral_2fa_mobile_number_taken ($user_id, $mobile) {
     );
 
     return 0 < count($users) && $user_id !== $users[0]->ID;
+}
+
+function ringcentral_gen_six_digit_code () {
+    $wpUser = $_SESSION['wpUser'];
+
+    // so generate a random 6 digit code
+    $six_digit_code = rand(100000, 999999);
+    // put code in the session
+    $_SESSION['six_digit_code'] = $six_digit_code;
+
+    // add space in the code for readability before sending to SMS (optional)
+    $six_digit_code = substr($six_digit_code, 0, 3) . " " . substr($six_digit_code, 3, 3);
+
+    // connect to SDK with credentials in the DB
+    $sdk = ringcentral_sdk();
+    $from = ringcentral_get_from_phone();
+    $to = get_user_meta($wpUser->ID, 'RingCentral_2fa_user_mobile', true);
+
+    try {
+        // echo "in try...";
+        $apiResponse = $sdk->platform()->post('/account/~/extension/~/sms',
+            array('from' => array('phoneNumber' => $from),
+                'to' => array(array('phoneNumber' => $to)),
+                'text' => "This is your validation code: " . $six_digit_code));
+    }
+    catch (\RingCentral\SDK\Http\ApiException $e) {
+        // Getting error messages using PHP native interface
+        $apiResponse = $e->apiResponse();
+        $message = '  Message: ' . $e->apiResponse->response()->error() . PHP_EOL;
+        // craft a friendly message here.
+        $return_message = "There was an error sending the validation code, Please try again later <br/>" . $message;
+    }
+    return;
 }
 
 ?>

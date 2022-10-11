@@ -468,6 +468,8 @@ function RingCentral_2fa_intercept ($user, $username, $password) {
     // should we test the password too ?
     $wpUser = get_user_by('login', $username);
 
+    // put $wpUser into the session ?
+    $_SESSION['wpUser'] = $wpUser;
     // check that the user is 2FA enabled in their user account data
     $TwoFA_on = get_user_meta($wpUser->ID, 'RingCentral_2fa_user_enabled', true);
     if (!$TwoFA_on) {
@@ -481,10 +483,10 @@ function RingCentral_2fa_intercept ($user, $username, $password) {
     // will be used in the verify function to see a user login cookie TTD
     $remember_me = isset($_POST['remember_me']) && $_POST['remember_me'] === 'forever';
 
-    // check the form token to ensure the same process is trying to login
-    if ($post_token && $post_token === $session_token) {
-        // not sure if this is worth it
-    }
+//    // check the form token to ensure the same process is trying to login
+//    if ($post_token && $post_token === $session_token) {
+//        // not sure if this is worth it
+//    }
     if ($wpUser) {
         ringcentral_2fa_verify($wpUser, $redirect_to, $remember_me);
     }
@@ -492,11 +494,6 @@ function RingCentral_2fa_intercept ($user, $username, $password) {
 }
 
 function ringcentral_2fa_verify ($wpUser, $redirect_to, $remember_me) {
-
-    // Get the mobile number associated with the admin user
-    $to = get_user_meta($wpUser->ID, 'RingCentral_2fa_user_mobile', true);
-    //$to = "9029405827";
-    $phone_partial = substr($to, -4);
 
     // the validation code form was submitted
     if (isset($_POST['RC_Validate_submit'])) {
@@ -512,6 +509,8 @@ function ringcentral_2fa_verify ($wpUser, $redirect_to, $remember_me) {
         }
     } else {
         // this is the first time the form is being displayed (later in this function)
+        ringcentral_gen_six_digit_code();
+        /*
         // so generate and send the code
         $six_digit_code = rand(100000, 999999);
         // put code in the session
@@ -537,13 +536,8 @@ function ringcentral_2fa_verify ($wpUser, $redirect_to, $remember_me) {
             $message = '  Message: ' . $e->apiResponse->response()->error() . PHP_EOL;
             // craft a friendly message here.
             $return_message = "There was an error sending the validation code, Please try again later <br/>" . $message;
-        }
+        } */
     }
-
-//    echo "</br>Session Object: <pre>";
-//    var_dump($_SESSION);
-//    echo "</pre>";
-
     ?>
     <style>
         <!--
@@ -552,6 +546,13 @@ function ringcentral_2fa_verify ($wpUser, $redirect_to, $remember_me) {
         }
         #login_error {
             background-color: salmon !important;
+            color: white;
+        }
+        #resend_code {
+            background-color: lightblue !important;
+            margin-top: 10px;
+            padding-top: 10px;
+            padding-bottom: 10px;
             color: white;
         }
         .center_2fa {
@@ -576,6 +577,9 @@ function ringcentral_2fa_verify ($wpUser, $redirect_to, $remember_me) {
     $_SESSION['RingCentral_session_token'] = $generated_token;
     $post_token = $generated_token;
 
+    // Phone partial
+    $phone_partial = substr(get_user_meta($wpUser->ID, 'RingCentral_2fa_user_mobile', true), -4);
+
     wp_logout();
     nocache_headers();
     header('Content-Type: ' . get_bloginfo('html_type') . '; charset=' . get_bloginfo('charset'));
@@ -584,7 +588,7 @@ function ringcentral_2fa_verify ($wpUser, $redirect_to, $remember_me) {
 
     ?>
     <div class="center_2fa">
-        <h2 id='page_title'><?= "RingCentral 6 Digit Admin access Validation"; ?></h2>
+        <h2 id='page_title'><?= "RingCentral 6 Digit WordPress Admin access Validation"; ?></h2>
 
         <?php if (!empty($errors)) { ?>
             <div id="login_error"><?php echo esc_html(implode('<br />', $errors)) ?></div>
@@ -614,6 +618,12 @@ function ringcentral_2fa_verify ($wpUser, $redirect_to, $remember_me) {
                 <?php } ?>
             </p>
         </form>
+        <!--        --><?php //if (!empty($errors)) { ?>
+        <!--            <div id="resend_code">-->
+        <!--                --><?php //$link_path = RINGCENTRAL_PLUGINURL . "resend_auth_code.php"; ?>
+        <!--                <a href="--><?php //echo $link_path ?><!--">Re-send Code?</a>-->
+        <!--            </div>-->
+        <!--        --><?php //} ?>
         <?php
         login_footer();
         exit; ?>
