@@ -3,8 +3,6 @@
  * Copyright (C) 2019-2022 Paladin Business Solutions
  *
  */
-error_reporting(E_ALL);
-ini_set('display_errors', 0);
 
 function ringcentral_2fa_save_settings ($user_id) {
 
@@ -104,6 +102,7 @@ function ringcentral_2fa_mobile_number_taken ($user_id, $mobile) {
 }
 
 function ringcentral_gen_six_digit_code () {
+
     $wpUser = $_SESSION['wpUser'];
 
     // so generate a random 6 digit code
@@ -133,7 +132,7 @@ function ringcentral_gen_six_digit_code () {
         // craft a friendly message here.
         $return_message = "There was an error sending the validation code, Please try again later <br/>" . $message;
     }
-    return;
+
 }
 
 ?>

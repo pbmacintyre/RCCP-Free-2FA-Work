@@ -510,33 +510,6 @@ function ringcentral_2fa_verify ($wpUser, $redirect_to, $remember_me) {
     } else {
         // this is the first time the form is being displayed (later in this function)
         ringcentral_gen_six_digit_code();
-        /*
-        // so generate and send the code
-        $six_digit_code = rand(100000, 999999);
-        // put code in the session
-        $_SESSION['six_digit_code'] = $six_digit_code;
-
-        // add space in the code for readability before sending to SMS (optional)
-        // $six_digit_code = substr($six_digit_code, 0, 3) . " " . substr($six_digit_code, 3, 3);
-
-        // connect to SDK with credentials in the DB
-        $sdk = ringcentral_sdk();
-        $from = ringcentral_get_from_phone();
-
-        try {
-            // echo "in try...";
-            $apiResponse = $sdk->platform()->post('/account/~/extension/~/sms',
-                array('from' => array('phoneNumber' => $from),
-                    'to' => array(array('phoneNumber' => $to)),
-                    'text' => "This is your validation code: " . $six_digit_code));
-        }
-        catch (\RingCentral\SDK\Http\ApiException $e) {
-            // Getting error messages using PHP native interface
-            $apiResponse = $e->apiResponse();
-            $message = '  Message: ' . $e->apiResponse->response()->error() . PHP_EOL;
-            // craft a friendly message here.
-            $return_message = "There was an error sending the validation code, Please try again later <br/>" . $message;
-        } */
     }
     ?>
     <style>
@@ -632,13 +605,10 @@ function ringcentral_2fa_verify ($wpUser, $redirect_to, $remember_me) {
 }
 
 add_action('authenticate', 'RingCentral_2fa_intercept', 10, 3);
-
 add_action('show_user_profile', 'ringcentral_2fa_user_settings');
 add_action('edit_user_profile', 'ringcentral_2fa_user_settings');
-
 add_action('personal_options_update', 'ringcentral_2fa_save_settings');
 add_action('edit_user_profile_update', 'ringcentral_2fa_save_settings');
-
 add_action('user_profile_update_errors', 'ringcentral_2fa_form_settings_validation', 10, 3);
 
 ?>
