@@ -591,12 +591,11 @@ function ringcentral_2fa_verify ($wpUser, $redirect_to, $remember_me) {
                 <?php } ?>
             </p>
         </form>
-        <!--        --><?php //if (!empty($errors)) { ?>
-        <!--            <div id="resend_code">-->
-        <!--                --><?php //$link_path = RINGCENTRAL_PLUGINURL . "resend_auth_code.php"; ?>
-        <!--                <a href="--><?php //echo $link_path ?><!--">Re-send Code?</a>-->
-        <!--            </div>-->
-        <!--        --><?php //} ?>
+        <?php if (!empty($errors)) { ?>
+            <div id="resend_code">
+                <a href="https://rccp-free.paladin-bs.com/wp-admin">Re-try login with new Code?</a>
+            </div>
+        <?php } ?>
         <?php
         login_footer();
         exit; ?>

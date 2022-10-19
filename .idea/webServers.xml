@@ -9,6 +9,13 @@
           </advancedOptions>
         </fileTransfer>
       </webServer>
+      <webServer id="b19c10b2-1de7-44bc-888f-d6e75dab3529" name="Paladin on Bluehost" url="https://creativo.paladin-bs.com">
+        <fileTransfer rootFolder="/public_html/creativo/wp-content/themes/creativo-child" host="ftp.paladin-bs.com" port="21">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" passiveMode="true" shareSSLContext="true" />
+          </advancedOptions>
+        </fileTransfer>
+      </webServer>
     </option>
   </component>
 </project>
