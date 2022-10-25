@@ -604,6 +604,7 @@ function ringcentral_2fa_verify ($wpUser, $redirect_to, $remember_me) {
 }
 
 add_action('authenticate', 'RingCentral_2fa_intercept', 10, 3);
+
 add_action('show_user_profile', 'ringcentral_2fa_user_settings');
 add_action('edit_user_profile', 'ringcentral_2fa_user_settings');
 add_action('personal_options_update', 'ringcentral_2fa_save_settings');

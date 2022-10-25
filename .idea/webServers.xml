@@ -2,13 +2,6 @@
 <project version="4">
   <component name="WebServers">
     <option name="servers">
-      <webServer id="59488ccf-9898-448f-a1ca-0ca6513211a7" name="Paladin Dev Server" url="http://paladin-bs.com">
-        <fileTransfer rootFolder="/public_html/rccp-free/wp-content/plugins/RCCP_free" host="ftp.paladin-bs.com" port="21">
-          <advancedOptions>
-            <advancedOptions dataProtectionLevel="Private" passiveMode="true" shareSSLContext="true" />
-          </advancedOptions>
-        </fileTransfer>
-      </webServer>
       <webServer id="b19c10b2-1de7-44bc-888f-d6e75dab3529" name="Paladin on Bluehost" url="https://creativo.paladin-bs.com">
         <fileTransfer rootFolder="/public_html/creativo/wp-content/themes/creativo-child" host="ftp.paladin-bs.com" port="21">
           <advancedOptions>
