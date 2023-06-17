@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (C) 2019-2022 Paladin Business Solutions
+ * Copyright (C) 2019-2023 Paladin Business Solutions
  *
  */
 
@@ -12,7 +12,7 @@ Function show_form($message, $label = "", $color = "green") {
 	<form action="" method="post" >
 	<table class="TableOverride" >
 		<tr class="TableOverride">
-			<td colspan="2" align="center">
+			<td colspan="2" style="text-align: center;">
 <?php	
 	if ($print_again == true) {
 	    echo "<font color='$color'><strong>" . esc_html($message) . "</strong></font>";
@@ -38,14 +38,22 @@ Function show_form($message, $label = "", $color = "green") {
 			<input type="text" name="email" value="<?php if ($print_again) { echo sanitize_email($_POST['email']); } ?>">
 		</td>
 	</tr>
-		<tr class="TableOverride">
+    <tr class="TableOverride">
 		<td class="left_col">
 			<p style='display: inline; <?php if ($label == "mobile") echo "color:red"; ?>' >mobile:</p>			
 		</td>
 		<td class="right_col">
-			<input type="text" name="mobile" onkeypress="return isNumberKey(event)" value="<?php if ($print_again) { echo sanitize_text_field($_POST['mobile']) ; } ?>">
+			<input type="text" name="mobile" onkeydown="return isNumberKey(event)"
+                   value="<?php if ($print_again) { echo sanitize_text_field($_POST['mobile']) ; } ?>">
 		</td>
-	</tr>	
+	</tr>
+    <tr class="TableOverride">
+        <td>&nbsp;</td>
+        <td >
+            <div style="margin-top: 5px; width: 93%; border: 1px solid #004F6D; padding: 5px; background: #DAF0F8;">I agree that the subscriber has opted in to receive SMS messages and/ or email communications.
+                I understand in order to send SMS the subscriber must specifically have opted into SMS.</div>
+        </td>
+    </tr>
 	<tr class="TableOverride">
 		<td colspan="2" align="center">			
 			<br/>

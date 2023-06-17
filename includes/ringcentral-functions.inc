@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (C) 2019-2022 Paladin Business Solutions
+ * Copyright (C) 2019-2023 Paladin Business Solutions
  *
  */
 
@@ -10,7 +10,7 @@
 function ringcentral_sdk() {
     // Include Libraries
     require('vendor/autoload.php');
-    
+
     // get control data
     global $wpdb;
     
@@ -21,23 +21,31 @@ function ringcentral_sdk() {
     $client_secret         = $result_rc->client_secret ;
     $ringcentral_user_name = $result_rc->ringcentral_user_name ;
     $ringcentral_extension = $result_rc->ringcentral_extension ;
+    // $ringcentral_password  = "_RAfiyuThECh48";
+//    echo "encryption: " . ringcentral_encrypt("_RAfiyuThECh48");
     $ringcentral_password  = ringcentral_decrypt($result_rc->ringcentral_password);
-    $ringcentral_sandbox   = $result_rc->ringcentral_sandbox ;
-    
+    $ringcentral_sandbox   = $result_rc->ringcentral_sandbox;
+
     if ($ringcentral_sandbox == 1) {
         // Use sandbox Client
         $sdk = new RingCentral\SDK\SDK($client_id, $client_secret, 
-            RingCentral\SDK\SDK::SERVER_SANDBOX);        
+            RingCentral\SDK\SDK::SERVER_SANDBOX);
     } else {
         // Use Production Client
         $sdk = new RingCentral\SDK\SDK($client_id, $client_secret, 
             RingCentral\SDK\SDK::SERVER_PRODUCTION);
-    }    
-    
+    }
+
     // Login via API
     if (!$sdk->platform()->loggedIn()) {
-        $sdk->platform()->login($ringcentral_user_name, 
-            $ringcentral_extension, $ringcentral_password);
+        try {
+//            space_echo("in try before login call");
+            $sdk->platform()->login($ringcentral_user_name,
+                $ringcentral_extension, $ringcentral_password);
+        } catch (\RingCentral\SDK\Http\ApiException $e) {
+            exit("Unable to authenticate to SDK platform. Check credentials. " . $e->apiResponse->response()->error() . PHP_EOL);
+            // echo "<br/><br/>Error trace: <br/>" . $e ;
+        }
     }
     return $sdk ;
 }

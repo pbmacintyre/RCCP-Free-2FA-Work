@@ -130,7 +130,7 @@ use of this plug in, but currently you do need to have a developer account.
 = 1.4.5 =
 * Ensured compatability with WordPress 5.8.1. 
 = 1.5 =
-* Ensured compatability with WordPress 6.0.2.
+* Ensured compatability with WordPress 6.2.2.
 * Added 2FA SMS 6 digit code admin validation to login process
 
 == Upgrade Notice ==

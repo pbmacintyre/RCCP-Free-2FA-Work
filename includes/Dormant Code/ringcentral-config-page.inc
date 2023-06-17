@@ -267,7 +267,70 @@ Function show_form($message, $label = "", $color = "#008EC2") {
           }
             ?>"></td>
 	</tr>	
-
+<!--    --><?php ///* =========== Team Messaging section ================= */ ?>
+<!--    <tr>-->
+<!--        <td colspan=2>-->
+<!--            <hr>-->
+<!--        </td>-->
+<!--    </tr>  -->
+<!--    -->
+<!--    <tr class="TableOverride">-->
+<!--		<td class="left_col">-->
+<!--			<p style='display: inline; --><?php //if ($label == "enable_glip") echo "color:red"; ?><!--' >Activate Team Messaging?</p>-->
+<!--			-->
+<!--			--><?php //echo ringcentral_build_help("enable_glip") ; ?>
+<!--						-->
+<!--		</td>-->
+<!--		<td class="right_col"><input type="checkbox" name="enable_glip" --><?php //
+//		if ($print_again) {
+//		    if ($_POST['enable_glip'] == "on") {
+//		      echo 'CHECKED';
+//		    }
+//          } else {
+//              if ($result_rc->enable_glip == 1) {
+//                  echo 'CHECKED' ;
+//                }
+//          }
+//            ?><!--></td>-->
+<!--	</tr>   -->
+<!--    -->
+<!--    <tr class="TableOverride">-->
+<!--		<td class="left_col">-->
+<!--			<p style='display: inline; --><?php //if ($label == "embed_width") echo "color:red"; ?><!--' >Team Messaging Width:</p>-->
+<!--            <!--  <p style='color: red; display: inline'>*</p>   -->-->
+<!--             -->
+<!--            --><?php //echo ringcentral_build_help("embed_width") ; ?>
+<!--                         -->
+<!--		</td>-->
+<!--		<td class="right_col"><input type="text" name="embed_width" style="width: 25%;" value="--><?php //
+//		  if ($print_again) {
+//		      echo sanitize_text_field($_POST['embed_width']);
+//          } else {
+//              if ($result_rc->embed_width) {
+//                  echo $result_rc->embed_width ;
+//              }
+//          }
+//            ?><!--"> px</td>-->
+<!--	</tr>	-->
+<!--    <tr class="TableOverride">-->
+<!--		<td class="left_col">-->
+<!--			<p style='display: inline; --><?php //if ($label == "embed_height") echo "color:red"; ?><!--' >Team Messaging Height:</p>-->
+<!--            <!--  <p style='color: red; display: inline'>*</p>   -->-->
+<!--             -->
+<!--            --><?php //echo ringcentral_build_help("embed_height") ; ?>
+<!--                         -->
+<!--		</td>-->
+<!--		<td class="right_col"><input type="text" name="embed_height" style="width: 25%;" value="--><?php //
+//		  if ($print_again) {
+//		      echo sanitize_text_field($_POST['embed_height']);
+//          } else {
+//              if ($result_rc->embed_height) {
+//                  echo $result_rc->embed_height ;
+//              }
+//          }
+//            ?><!--"> px</td>-->
+<!--	</tr>	-->
+	
 	<?php /* ========= Google ReCaptcha Section =================== */ ?>
     <tr>
         <td colspan=2>
@@ -405,21 +468,21 @@ Function check_form() {
 	    $message = "OAuth Secret Key cannot be blank.>";
 	} */
 	
-//	if ($_POST['embedded_phone'] == "on" && $_POST['enable_glip'] == "on" ) {
-//		$print_again = true;
-//		$label = "embedded_phone";
-//		$message = "Both embedded phone and team messaging cannot be activated at the same time.";
-//	}
-//	if ($_POST['embed_width'] <= 0 && $_POST['enable_glip'] == "on") {
-//		$print_again = true;
-//		$label = "embed_width";
-//		$message = "If you are activating embeded team messaging then the width setting cannot be blank and must be greater than 0";
-//	}
-//	if ($_POST['embed_height'] <= 0 && $_POST['enable_glip'] == "on") {
-//		$print_again = true;
-//		$label = "embed_height";
-//		$message = "If you are activating embeded team messaging then the height setting cannot be blank and must be greater than 0";
-//	}
+	if ($_POST['embedded_phone'] == "on" && $_POST['enable_glip'] == "on" ) {
+		$print_again = true;
+		$label = "embedded_phone";
+		$message = "Both embedded phone and team messaging cannot be activated at the same time.";
+	}
+	if ($_POST['embed_width'] <= 0 && $_POST['enable_glip'] == "on") {
+		$print_again = true;
+		$label = "embed_width";
+		$message = "If you are activating embeded team messaging then the width setting cannot be blank and must be greater than 0";
+	}
+	if ($_POST['embed_height'] <= 0 && $_POST['enable_glip'] == "on") {
+		$print_again = true;
+		$label = "embed_height";
+		$message = "If you are activating embeded team messaging then the height setting cannot be blank and must be greater than 0";
+	}
 
 	// end data integrity checking
 
