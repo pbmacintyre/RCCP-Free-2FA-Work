@@ -2,15 +2,16 @@
 
 namespace PubNub;
 
+use PubNub\Exceptions\PubNubConfigurationException;
 use PubNub\Exceptions\PubNubValidationException;
-use Requests_Transport;
-
+use WpOrg\Requests\Transport;
 
 class PNConfiguration
 {
-    const DEFAULT_NON_SUBSCRIBE_REQUEST_TIMEOUT = 10;
-    const DEFAULT_SUBSCRIBE_TIMEOUT = 310;
-    const DEFAULT_CONNECT_TIMEOUT = 10;
+    private const DEFAULT_NON_SUBSCRIBE_REQUEST_TIMEOUT = 10;
+    private const DEFAULT_SUBSCRIBE_TIMEOUT = 310;
+    private const DEFAULT_CONNECT_TIMEOUT = 10;
+    private const DEFAULT_USE_RANDOM_IV = true;
 
     /** @var  string Subscribe key provided by PubNub */
     private $subscribeKey;
@@ -48,8 +49,13 @@ class PNConfiguration
     /** @var  int */
     protected $subscribeTimeout;
 
-    /** @var  Requests_Transport */
+    /** @var  Transport */
     protected $transport;
+
+    /** @var bool */
+    protected $useRandomIV;
+
+    private $usingUserId = null;
 
     /**
      * PNConfiguration constructor.
@@ -59,6 +65,7 @@ class PNConfiguration
         $this->nonSubscribeRequestTimeout = static::DEFAULT_NON_SUBSCRIBE_REQUEST_TIMEOUT;
         $this->connectTimeout = static::DEFAULT_CONNECT_TIMEOUT;
         $this->subscribeTimeout = static::DEFAULT_SUBSCRIBE_TIMEOUT;
+        $this->useRandomIV = static::DEFAULT_USE_RANDOM_IV;
     }
 
     /**
@@ -68,9 +75,10 @@ class PNConfiguration
      */
     public static function demoKeys()
     {
-        $config = new static();
+        $config = new self();
         $config->setSubscribeKey("demo");
         $config->setPublishKey("demo");
+        $config->setUuid("demo");
 
         return $config;
     }
@@ -128,7 +136,7 @@ class PNConfiguration
     public function setCipherKey($cipherKey)
     {
         if ($this->crypto == null) {
-            $this->crypto = new PubNubCrypto($cipherKey);
+            $this->crypto = new PubNubCrypto($cipherKey, $this->getUseRandomIV());
         } else {
             $this->getCrypto()->setCipherKey($cipherKey);
         }
@@ -166,6 +174,17 @@ class PNConfiguration
     public function getOrigin()
     {
         return $this->origin;
+    }
+
+    /**
+     * @param string $origin
+     * @return $this
+     */
+    public function setOrigin($origin)
+    {
+        $this->origin = $origin;
+
+        return $this;
     }
 
     /**
@@ -216,10 +235,6 @@ class PNConfiguration
      */
     public function getUuid()
     {
-        if (empty($this->uuid)) {
-            $this->uuid = PubNubUtil::uuid();
-        }
-
         return $this->uuid;
     }
 
@@ -229,7 +244,40 @@ class PNConfiguration
      */
     public function setUuid($uuid)
     {
+        if (!is_null($this->usingUserId) && $this->usingUserId) {
+            throw new PubNubConfigurationException("Cannot use UserId and UUID simultaneously");
+        }
+        if (!$this->validateNotEmptyString($uuid)) {
+            throw new PubNubConfigurationException("UUID should not be empty");
+        }
+        $this->usingUserId = false;
         $this->uuid = $uuid;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getUserId()
+    {
+        return $this->uuid;
+    }
+
+    /**
+     * @param string $userId
+     * @return $this
+     */
+    public function setUserId($userId)
+    {
+        if (!is_null($this->usingUserId) && !$this->usingUserId) {
+            throw new PubNubConfigurationException("Cannot use UserId and UUID simultaneously");
+        }
+        if (!$this->validateNotEmptyString($userId)) {
+            throw new PubNubConfigurationException("UserID should not be empty");
+        }
+        $this->usingUserId = true;
+        $this->uuid = $userId;
 
         return $this;
     }
@@ -321,10 +369,13 @@ class PNConfiguration
 
     /**
      * @param int $connectTimeout
+     * @return $this
      */
     public function setConnectTimeout($connectTimeout)
     {
         $this->connectTimeout = $connectTimeout;
+
+        return $this;
     }
 
     /**
@@ -339,7 +390,7 @@ class PNConfiguration
     }
 
     /**
-     * @return Requests_Transport
+     * @return Transport
      */
     public function getTransport()
     {
@@ -347,7 +398,7 @@ class PNConfiguration
     }
 
     /**
-     * @param Requests_Transport $transport
+     * @param Transport $transport
      * @return $this
      */
     public function setTransport($transport)
@@ -357,4 +408,31 @@ class PNConfiguration
         return $this;
     }
 
+    /**
+     * @return bool
+     */
+    public function getUseRandomIV()
+    {
+        return $this->useRandomIV;
+    }
+
+    /**
+     * @param bool $useRandomIV
+     * @return $this
+     */
+    public function setUseRandomIV($useRandomIV)
+    {
+        $this->useRandomIV = $useRandomIV;
+
+        if ($this->crypto != null) {
+            $this->crypto->setUseRandomIV($this->useRandomIV);
+        }
+
+        return $this;
+    }
+
+    private function validateNotEmptyString($value)
+    {
+        return (is_string($value) && strlen(trim($value)) > 0);
+    }
 }

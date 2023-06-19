@@ -10,8 +10,8 @@ use Psr\Http\Message\StreamInterface;
 class MultipartBuilder
 {
 
-    protected $_body = array();
-    protected $_contents = array();
+    protected $_body = [];
+    protected $_contents = [];
     protected $_boundary = null;
 
     public function setBoundary($boundary = '')
@@ -20,12 +20,15 @@ class MultipartBuilder
         return $this;
     }
 
+    /**
+     * @return null
+     */
     public function boundary()
     {
         return $this->_boundary;
     }
 
-    public function setBody(array $body = array())
+    public function setBody(array $body = [])
     {
         $this->_body = $body;
         return $this;
@@ -46,10 +49,10 @@ class MultipartBuilder
      * @param string                          $name     Optional. Form field name
      * @return $this
      */
-    public function add($content, $filename = '', array $headers = array(), $name = '')
+    public function add($content, $filename = '', array $headers = [], $name = '')
     {
 
-        $uri = null;
+        $uri = '';
 
         if (!empty($filename)) {
 
@@ -78,10 +81,10 @@ class MultipartBuilder
 
         $name = !empty($name) ? $name : $basename;
 
-        $element = array(
+        $element = [
             'contents' => $content,
             'name'     => $name
-        );
+        ];
 
         // always set as defined or else it will be auto-discovered by Guzzle
         if (!empty($filename)) {
@@ -109,7 +112,7 @@ class MultipartBuilder
 
             } elseif ($content instanceof StreamInterface) {
 
-                $type = \GuzzleHttp\Psr7\mimetype_from_filename($basename);
+                $type = \GuzzleHttp\Psr7\MimeType::fromFilename($basename);
 
                 if (!$type) {
                     throw new \InvalidArgumentException('Content-Type header was not provided and cannot be auto-discovered');
@@ -133,14 +136,14 @@ class MultipartBuilder
     /**
      * @param string $uri
      * @param string $method
-     * @throws \InvalidArgumentException
      * @return RequestInterface
+     * @throws \InvalidArgumentException
      */
     public function request($uri, $method = 'POST')
     {
 
         $stream = $this->requestBody();
-        $headers = array('Content-Type' => 'multipart/form-data; boundary=' . $stream->getBoundary());
+        $headers = ['Content-Type' => 'multipart/form-data; boundary=' . $stream->getBoundary()];
 
         return new Request($method, $uri, $headers, $stream);
 
@@ -152,16 +155,16 @@ class MultipartBuilder
     protected function requestBody()
     {
 
-        $body = array(
-            array(
+        $body = [
+            [
                 'name'     => 'json',
                 'contents' => json_encode($this->_body),
-                'headers'  => array(
+                'headers'  => [
                     'Content-Type' => 'application/json'
-                ),
+                ],
                 'filename' => 'request.json',
-            )
-        );
+            ]
+        ];
 
         $stream = new MultipartStream(array_merge($body, $this->_contents), $this->_boundary);
 

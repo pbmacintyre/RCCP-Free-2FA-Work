@@ -1,12 +1,18 @@
 # RingCentral SDK for PHP
 
-[![Build Status](https://img.shields.io/travis/ringcentral/ringcentral-php/master.svg)](https://travis-ci.org/ringcentral/ringcentral-php)
+[![Build Status](https://github.com/ringcentral/ringcentral-php/workflows/CI%20Pipeline/badge.svg?branch=master)](https://github.com/ringcentral/ringcentral-php/actions)
 [![Coverage Status](https://coveralls.io/repos/ringcentral/ringcentral-php/badge.svg?branch=master&service=github)](https://coveralls.io/github/ringcentral/ringcentral-php?branch=master)
 [![Chat](https://img.shields.io/badge/chat-on%20glip-orange.svg)](https://glipped.herokuapp.com/)
+[![Twitter](https://img.shields.io/twitter/follow/ringcentraldevs.svg?style=social&label=follow)](https://twitter.com/RingCentralDevs)
+
+__[RingCentral Developers](https://developer.ringcentral.com/api-products)__ is a cloud communications platform which can be accessed via more than 70 APIs. The platform's main capabilities include technologies that enable:
+__[Voice](https://developer.ringcentral.com/api-products/voice), [SMS/MMS](https://developer.ringcentral.com/api-products/sms), [Fax](https://developer.ringcentral.com/api-products/fax), [Glip Team Messaging](https://developer.ringcentral.com/api-products/team-messaging), [Data and Configurations](https://developer.ringcentral.com/api-products/configuration)__.
+
+[API Reference](https://developer.ringcentral.com/api-docs/latest/index.html) and [APIs Explorer](https://developer.ringcentral.com/api-explorer/latest/index.html).
 
 # Requirements
 
-- PHP 5.5+
+- PHP 7.2+
 - CURL extension
 - MCrypt extension
 
@@ -59,7 +65,7 @@ Please keep in mind that bundled dependencies may interfere with your other depe
 ## Initialization
 
 ```php
-$sdk = new RingCentral\SDK\SDK('clientId', 'clientSecret', RingCentral\SDK\SDK::SERVER_SANDBOX);
+$rcsdk = new RingCentral\SDK\SDK('clientId', 'clientSecret', RingCentral\SDK\SDK::SERVER_SANDBOX);
 ```
 
 You also may supply custom AppName and AppVersion parameters with your application codename and version. These parameters
@@ -67,7 +73,7 @@ are optional but they will help a lot to identify your application in API logs a
 Allowed characters for AppName and AppVersion are: letters, digits, hyphen, dot and underscore.
 
 ```php
-$sdk = new RingCentral\SDK\SDK('clientId', 'clientSecret', RingCentral\SDK\SDK::SERVER_SANDBOX, 'MyApp', '1.0.0');
+$rcsdk = new RingCentral\SDK\SDK('clientId', 'clientSecret', RingCentral\SDK\SDK::SERVER_SANDBOX, 'MyApp', '1.0.0');
 ```
 
 For production use `RingCentral\SDK\SDK::SERVER_PRODUCTION` constant. Or type in the server URL by hand.
@@ -77,13 +83,23 @@ For production use `RingCentral\SDK\SDK::SERVER_PRODUCTION` constant. Or type in
 Check authentication status:
 
 ```php
-$sdk->platform()->loggedIn();
+$rcsdk->platform()->loggedIn();
 ```
 
-Authenticate user:
+Authenticate user with jwt:
 
 ```php
-$sdk->platform()->login('username', 'extension (or leave blank)', 'password');
+$rcsdk->platform()->login([
+    'jwt': 'your_jwt_token'
+]);
+```
+
+Authenticate user with authorization code:
+
+```php
+$rcsdk->platform()->login([
+    'code': 'authorization code from RingCentral login redirect uri'
+]);
 ```
 
 ### Authentication lifecycle
@@ -92,10 +108,10 @@ Platform class performs token refresh procedure if needed. You can save authenti
 
 ```php
 // when application is going to be stopped
-file_put_contents($file, json_encode($platform->auth()->data(), JSON_PRETTY_PRINT));
+file_put_contents($file, json_encode($rcsdk->platform()->auth()->data(), JSON_PRETTY_PRINT));
 
 // and then next time during application bootstrap before any authentication checks:
-$sdk->platform()->auth->setData(json_decode(file_get_contents($file), true);
+$rcsdk->platform()->auth()->setData(json_decode(file_get_contents($file), true));
 ```
 
 **Important!** You have to manually maintain synchronization of SDK's between requests if you share authentication.
@@ -105,10 +121,10 @@ semaphor and pause other pending requests while one of them is performing refres
 ## Performing API call
 
 ```php
-$apiResponse = $sdk->platform()->get('/account/~/extension/~');
-$apiResponse = $sdk->platform()->post('/account/~/extension/~', array(...));
-$apiResponse = $sdk->platform()->put('/account/~/extension/~', array(...));
-$apiResponse = $sdk->platform()->delete('/account/~/extension/~');
+$apiResponse = $rcsdk->platform()->get('/account/~/extension/~');
+$apiResponse = $rcsdk->platform()->post('/account/~/extension/~', array(...));
+$apiResponse = $rcsdk->platform()->put('/account/~/extension/~', array(...));
+$apiResponse = $rcsdk->platform()->delete('/account/~/extension/~');
 
 print_r($apiResponse->json()); // stdClass will be returned or exception if Content-Type is not JSON
 print_r($apiResponse->request()); // PSR-7's RequestInterface compatible instance used to perform HTTP request
@@ -121,7 +137,7 @@ Loading of multiple comma-separated IDs will result in HTTP 207 with `Content-Ty
 be parsed into multiple sub-responses:
 
 ```php
-$presences = $sdk->platform()
+$presences = $rcsdk->platform()
                  ->get('/account/~/extension/id1,id2/presence')
                  ->multipart();
 
@@ -133,7 +149,7 @@ print 'Presence loaded ' .
 ### Send SMS - Make POST request
 
 ```php
-$apiResponse = $sdk->platform()->post('/account/~/extension/~/sms', array(
+$apiResponse = $rcsdk->platform()->post('/account/~/extension/~/sms', array(
     'from' => array('phoneNumber' => 'your-ringcentral-sms-number'),
     'to'   => array(
         array('phoneNumber' => 'mobile-number'),
@@ -147,7 +163,7 @@ $apiResponse = $sdk->platform()->post('/account/~/extension/~/sms', array(
 ```php
 try {
 
-    $sdk->platform()->get('/account/~/whatever');
+    $rcsdk->platform()->get('/account/~/whatever');
 
 } catch (\RingCentral\SDK\Http\ApiException $e) {
 
@@ -186,7 +202,7 @@ $rcsdk = new SDK("clientId", "clientSecret", SDK::SERVER_PRODUCTION, 'Demo', '1.
 ## Webhook Subscriptions
 
 ```php
-$apiResponse = $sdk->platform()->post('/subscription', array(
+$apiResponse = $rcsdk->platform()->post('/subscription', array(
     'eventFilters' => array(
         '/restapi/v1.0/account/~/extension/~/message-store',
         '/restapi/v1.0/account/~/extension/~/presence'
@@ -200,24 +216,56 @@ $apiResponse = $sdk->platform()->post('/subscription', array(
 
 When webhook subscription is created, it will send a request with `validation-token` in headers to webhook address. Webhook address should return a success request with `validation-token` in headers to finish webhook register.
 
-## Pubnub Subscriptions
+## WebSocket Subscriptions
+
+```php
+use RingCentral\SDK\WebSocket\WebSocket;
+use RingCentral\SDK\WebSocket\Subscription;
+use RingCentral\SDK\WebSocket\Events\NotificationEvent;
+
+// connect websocket
+$websocket = $rcsdk->initWebSocket();
+$websocket->addListener(WebSocket::EVENT_READY, function (SuccessEvent $e) {
+    print 'Websocket Ready' . PHP_EOL;
+    print 'Connection Details' . print_r($e->apiResponse()->body(), true) . PHP_EOL;
+});
+$websocket->addListener(WebSocket::EVENT_ERROR, function (ErrorEvent $e) {
+    print 'Websocket Error' . PHP_EOL;
+});
+$websocket->connect();
+
+// create subscription
+$subscription = $rcsdk->createSubscription();
+$subscription->addEvents(array(
+    '/restapi/v1.0/account/~/extension/~/presence',
+    '/restapi/v1.0/account/~/extension/~/message-store/instant?type=SMS'
+));
+$subscription->addListener(Subscription::EVENT_NOTIFICATION, function (NotificationEvent $e) {
+    print 'Notification ' . print_r($e->payload(), true) . PHP_EOL;
+});
+$subscription->register();
+```
+
+We need to create websocket connection before creating subscription. When websocket connection get error, need to re-created websocket and subscription manually.
+
+## PubNub Subscriptions
+
+This is **deprecated**, please use WebSocket Subscription.
 
 ```php
 use RingCentral\SDK\Subscription\Events\NotificationEvent;
-use RingCentral\SDK\Subscription\Subscription;
+use RingCentral\SDK\Subscription\PubnubSubscription;
 
-$subscription = $sdk->createSubscription()
-                     ->addEvents(array('/restapi/v1.0/account/~/extension/~/presence'))
-                     ->addListener(Subscription::EVENT_NOTIFICATION, function (NotificationEvent $e) {
-
-                         print_r($e->getPayload());
-
-                     });
-
+$subscription = $rcsdk->createSubscription('Pubnub);
+$subscription->addEvents(array('/restapi/v1.0/account/~/extension/~/presence'))
+$subscription->addListener(PubnubSubscription::EVENT_NOTIFICATION, function (NotificationEvent $e) {
+    print_r($e->payload());
+});
+$subscription->setKeepPolling(true);
 $apiResponse = $subscription->register();
 ```
 
-Please keep in mind that due to limitations of PUBNUB library, which is synchronous, subscriptions may expire and must
+Please keep in mind that due to limitations of the PubNub library, which is synchronous, subscriptions may expire and must
 be re-created manually.
 
 # Multipart Requests
@@ -236,7 +284,7 @@ $request = $rcsdk->createMultipartBuilder()
                  ->add(fopen('path/to/file', 'r'))
                  ->request('/account/~/extension/~/fax'); // also has optional $method argument
 
-$response = $platform->sendRequest($request);
+$response = $rcsdk->platform()->sendRequest($request);
 ```
 
 # How to demo?

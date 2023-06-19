@@ -15,8 +15,13 @@ use PubNub\Models\ResponseHelpers\PNStatus;
 use PubNub\Models\ResponseHelpers\ResponseInfo;
 use PubNub\PubNub;
 use PubNub\PubNubUtil;
-use Requests_Exception;
-
+use WpOrg\Requests\Requests;
+use WpOrg\Requests\Exception as RequestsException;
+use WpOrg\Requests\Exception\Transport\Curl as RequestsTransportCurlException;
+use WpOrg\Requests\Exception\Http\StatusUnknown as ReuestsHttpStatusUnknownException;
+use WpOrg\Requests\Exception\Http as RequestsHttpException;
+use WpOrg\Requests\Transport\Curl;
+use WpOrg\Requests\Transport\Fsockopen;
 
 abstract class Endpoint
 {
@@ -25,6 +30,9 @@ abstract class Endpoint
 
     /** @var  PNEnvelope */
     protected $envelope;
+
+    /** @var array */
+    protected static $cachedTransports = [];
 
     public function __construct(PubNub $pubnubInstance)
     {
@@ -82,7 +90,10 @@ abstract class Endpoint
     /**
      * @return string
      */
-    abstract protected function getName();
+    protected function getName()
+    {
+        return substr(strrchr(get_class($this), '\\'), 1);
+    }
 
     /**
      * @throws PubNubValidationException
@@ -132,6 +143,16 @@ abstract class Endpoint
         }
     }
 
+    protected function defaultHeaders()
+    {
+        return ['Accept' => 'application/json', 'Connection' => 'Keep-Alive'];
+    }
+
+    protected function customHeaders()
+    {
+        return [];
+    }
+
     /**
      * @return array
      */
@@ -143,8 +164,19 @@ abstract class Endpoint
         $params['pnsdk'] = "PubNub-PHP/" . $this->pubnub->getSdkVersion();
         $params['uuid'] = $config->getUuid();
 
-        if ($this->isAuthRequired() && $config->getAuthKey()) {
-            $params['auth'] = $config->getAuthKey();
+        if ($this->isAuthRequired()) {
+            $token = $this->pubnub->getToken();
+            if ($token) {
+                $params['auth'] = $token;
+            } elseif ($config->getAuthKey()) {
+                $params['auth'] = $config->getAuthKey();
+            }
+        }
+
+        if (!!$this->pubnub->getTelemetryManager()) {
+            foreach ($this->pubnub->getTelemetryManager()->operationLatencies() as $queryName => $queryParam) {
+                $params[$queryName] = PubNubUtil::urlEncode($queryParam);
+            }
         }
 
         return $params;
@@ -161,33 +193,51 @@ abstract class Endpoint
         $config = $this->pubnub->getConfiguration();
 
         if ($config->getSecretKey()) {
-            $params['timestamp'] = (string) $this->pubnub->timestamp();
-            $signedInput = $config->getSubscribeKey() . "\n" . $config->getPublishKey() . "\n";
+            $httpMethod = $this->httpMethod();
 
-            if ($this->getOperationType() == PNOperationType::PNAccessManagerGrant ||
-                $this->getOperationType() == PNOperationType::PNAccessManagerRevoke) {
-                $signedInput .= "grant\n";
-            } else if ($this->getOperationType() === PNOperationType::PNAccessManagerAudit) {
-                $signedInput .= "audit\n";
-            } else {
-                $signedInput .= $this->buildPath() . "\n";
+            if ($this->getName() == "Publish") {
+                // This is because of a server-side bug, old publish using post should be deprecated
+                $httpMethod = PNHttpMethod::GET;
             }
 
-            $signedInput .= PubNubUtil::preparePamParams($params);
+            $params['timestamp'] = (string) $this->pubnub->timestamp();
 
-            $params['signature'] = PubNubUtil::signSha256(
+            ksort($params);
+
+            $signedInput = $httpMethod
+                . "\n"
+                . $config->getPublishKey()
+                . "\n"
+                . $this->buildPath()
+                . "\n"
+                . PubNubUtil::preparePamParams($params)
+                . "\n";
+
+            if (PNHttpMethod::POST == $httpMethod || PNHttpMethod::PATCH == $httpMethod) {
+                $signedInput .= $this->buildData();
+            }
+
+            $signature = 'v2.' . PubNubUtil::signSha256(
                 $this->pubnub->getConfiguration()->getSecretKey(),
                 $signedInput
             );
+
+            $signature = preg_replace('/=+$/', '', $signature);
+
+            $params['signature'] = $signature;
         }
 
-        if ($this->getOperationType() == PNOperationType::PNPublishOperation
-            && array_key_exists('meta', $this->customParams())) {
+        if (
+            $this->getOperationType() == PNOperationType::PNPublishOperation
+            && array_key_exists('meta', $this->customParams())
+        ) {
             $params['meta'] = PubNubUtil::urlEncode($params['meta']);
         }
 
-        if ($this->getOperationType() == PNOperationType::PNSetStateOperation
-            && array_key_exists('state', $this->customParams())) {
+        if (
+            $this->getOperationType() == PNOperationType::PNSetStateOperation
+            && array_key_exists('state', $this->customParams())
+        ) {
             $params['state'] = PubNubUtil::urlEncode($params['state']);
         }
 
@@ -201,6 +251,14 @@ abstract class Endpoint
 
         if (array_key_exists('auth', $params)) {
             $params['auth'] = PubNubUtil::urlEncode($params['auth']);
+        }
+
+        if (array_key_exists('channel', $params)) {
+            $params['channel'] = PubNubUtil::urlEncode($params['channel']);
+        }
+
+        if (array_key_exists('channel-group', $params)) {
+            $params['channel-group'] = PubNubUtil::urlEncode($params['channel-group']);
         }
 
         return $params;
@@ -261,10 +319,13 @@ abstract class Endpoint
     /**
      * @return array
      */
-    protected function requestOptions() {
+    protected function requestOptions()
+    {
         $options = [
             'timeout' => $this->getRequestTimeout(),
-            'connect_timeout' => $this->getConnectTimeout()
+            'connect_timeout' => $this->getConnectTimeout(),
+            'transport' => $this->getDefaultTransport(),
+            'useragent' => 'PHP/' . PHP_VERSION,
         ];
 
         $transport = $this->pubnub->getConfiguration()->getTransport();
@@ -281,7 +342,7 @@ abstract class Endpoint
      */
     protected function invokeRequest()
     {
-        $headers = ['Accept' => 'application/json'];
+        $headers = array_merge($this->defaultHeaders(), $this->customHeaders());
 
         $url = PubNubUtil::buildUrl(
             $this->pubnub->getBasePath(),
@@ -289,12 +350,8 @@ abstract class Endpoint
             $this->buildParams()
         );
         $data = $this->buildData();
-        $method = \Requests::GET;
+        $method = $this->httpMethod();
         $options = $this->requestOptions();
-
-        if ($this->httpMethod() == PNHttpMethod::POST) {
-            $method = \Requests::POST;
-        }
 
         $this->pubnub->getLogger()->debug($method . " " . $url, ['method' => $this->getName()]);
 
@@ -303,10 +360,11 @@ abstract class Endpoint
         }
 
         $statusCategory = PNStatusCategory::PNUnknownCategory;
+        $requestTimeStart = microtime(true);
 
         try {
-            $request = \Requests::request($url, $headers, $data, $method, $options);
-        } catch (\Requests_Exception_HTTP_Unknown $e) {
+            $request = Requests::request($url, $headers, $data, $method, $options);
+        } catch (ReuestsHttpStatusUnknownException $e) {
             $this->pubnub->getLogger()->error($e->getMessage(), ['method' => $this->getName()]);
 
             return new PNEnvelope($e->getData(), $this->createStatus(
@@ -315,7 +373,7 @@ abstract class Endpoint
                 null,
                 (new PubNubConnectionException())->setOriginalException($e)
             ));
-        } catch (\Requests_Exception_Transport_cURL  $e) {
+        } catch (RequestsTransportCurlException $e) {
             $this->pubnub->getLogger()->error($e->getMessage(), ['method' => $this->getName()]);
 
             return new PNEnvelope($e->getData(), $this->createStatus(
@@ -324,7 +382,7 @@ abstract class Endpoint
                 null,
                 (new PubNubConnectionException())->setOriginalException($e)
             ));
-        } catch (\Requests_Exception_HTTP $e) {
+        } catch (RequestsHttpException $e) {
             $this->pubnub->getLogger()->error($e->getMessage(), ['method' => $this->getName()]);
 
             return new PNEnvelope($e->getData(), $this->createStatus(
@@ -333,7 +391,7 @@ abstract class Endpoint
                 null,
                 (new PubNubConnectionException())->setOriginalException($e)
             ));
-        } catch (Requests_Exception $e) {
+        } catch (RequestsException $e) {
             if ($e->getType() === 'curlerror' && strpos($e->getMessage(), "cURL error 28") === 0) {
                 $statusCategory = PNStatusCategory::PNTimeoutCategory;
             }
@@ -367,6 +425,7 @@ abstract class Endpoint
         $uuid = null;
         $authKey = null;
 
+
         if (array_key_exists('uuid', $query) && strlen($query['uuid']) > 0) {
             $uuid = $query['uuid'];
         }
@@ -385,16 +444,30 @@ abstract class Endpoint
         );
 
         if ($request->status_code == 200) {
-            $this->pubnub->getLogger()->debug("Response body: " . $request->body,
-                ['method' => $this->getName(), 'statusCode' => $request->status_code]);
+            $requestTimeEnd = microtime(true);
+
+            if (!!$this->pubnub->getTelemetryManager()) {
+                $this->pubnub->getTelemetryManager()->cleanUpTelemetryData();
+                $this->pubnub->getTelemetryManager()->storeLatency(
+                    $requestTimeEnd - $requestTimeStart,
+                    $this->getOperationType()
+                );
+            }
+
+            $this->pubnub->getLogger()->debug(
+                "Response body: " . $request->body,
+                ['method' => $this->getName(), 'statusCode' => $request->status_code]
+            );
 
             // NOTICE: 1 == JSON_OBJECT_AS_ARRAY (hhvm doesn't support this constant)
             $parsedJSON = json_decode($request->body, true, 512, 1);
             $errorMessage = json_last_error_msg();
 
             if (json_last_error()) {
-                $this->pubnub->getLogger()->error("Unable to decode JSON body: " . $request->body,
-                    ['method' => $this->getName()]);
+                $this->pubnub->getLogger()->error(
+                    "Unable to decode JSON body: " . $request->body,
+                    ['method' => $this->getName()]
+                );
 
                 return new PNEnvelope(null, $this->createStatus(
                     $statusCategory,
@@ -406,12 +479,16 @@ abstract class Endpoint
                 ));
             }
 
-            return new PNEnvelope($this->createResponse($parsedJSON),
+            return new PNEnvelope(
+                $this->createResponse($parsedJSON),
                 $this->createStatus($statusCategory, $request->body, $responseInfo, null)
             );
         } else {
-            $this->pubnub->getLogger()->warning("Response error: " . $request->body,
-                ['method' => $this->getName(), 'statusCode' => $request->status_code]);
+            $this->pubnub->getLogger()->warning(
+                "Response error: " . $request->body,
+                ['method' => $this->getName(),
+                'statusCode' => $request->status_code]
+            );
 
             switch ($request->status_code) {
                 case 400:
@@ -469,6 +546,7 @@ abstract class Endpoint
         $pnStatus->setCategory($category);
         $pnStatus->setAffectedChannels($this->getAffectedChannels());
         $pnStatus->setAffectedChannelGroups($this->getAffectedChannelGroups());
+        $pnStatus->setAffectedUsers($this->getAffectedUsers());
 
         return $pnStatus;
     }
@@ -483,12 +561,59 @@ abstract class Endpoint
         return null;
     }
 
+    protected function getAffectedUsers()
+    {
+        return null;
+    }
+
+    /**
+     * @return \WpOrg\Requests\Transport
+     * @throws \Exception
+     */
+    private function getDefaultTransport()
+    {
+        $need_ssl = (0 === stripos($this->pubnub->getBasePath(), 'https://'));
+        $capabilities = array('ssl' => $need_ssl);
+
+        $cap_string = serialize($capabilities);
+        $method = $this->httpMethod();
+
+        if (!isset(self::$cachedTransports[$method])) {
+            self::$cachedTransports[$method] = [];
+        }
+
+        if (isset(self::$cachedTransports[$method][$cap_string]) && self::$cachedTransports[$method][$cap_string] !== null) {
+            return self::$cachedTransports[$method][$cap_string];
+        }
+
+        $transports = array(Curl::class, Fsockopen::class);
+
+        foreach ($transports as $class) {
+            if (!class_exists($class)) {
+                continue;
+            }
+
+            $result = call_user_func(array($class, 'test'), $capabilities);
+            if ($result) {
+                self::$cachedTransports[$method][$cap_string] = new $class();
+                break;
+            }
+        }
+
+        if (self::$cachedTransports[$method][$cap_string] === null) {
+            throw new \Exception('No working transports found');
+        }
+
+        return self::$cachedTransports[$method][$cap_string];
+    }
+
     /**
      * @param $json
      * @return array
      * @throws PubNubResponseParsingException
      */
-    protected static function fetchPayload($json) {
+    protected static function fetchPayload($json)
+    {
         if (!boolval($json)) {
             throw (new PubNubResponseParsingException())->setDescription("Body cannot be null");
         }

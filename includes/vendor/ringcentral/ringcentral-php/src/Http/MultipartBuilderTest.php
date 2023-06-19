@@ -9,7 +9,7 @@ class MultipartBuilderTest extends TestCase
 
     private $fname;
 
-    public function setup()
+    public function setup(): void
     {
 
         $this->fname = tempnam('/tmp', 'tfile') . '.txt';
@@ -22,7 +22,7 @@ class MultipartBuilderTest extends TestCase
 
     }
 
-    public function tearDown()
+    public function tearDown(): void
     {
 
         if (file_exists($this->fname)) {
@@ -52,7 +52,7 @@ class MultipartBuilderTest extends TestCase
 
         $builder = new MultipartBuilder();
 
-        $builder->setBody(array('to' => array('phoneNumber' => 'foo'), 'faxResolution' => 'High'))
+        $builder->setBody(['to' => ['phoneNumber' => 'foo'], 'faxResolution' => 'High'])
                 ->setBoundary('boundary')
                 ->add('plain text', 'plain.txt');
 
@@ -62,16 +62,15 @@ class MultipartBuilderTest extends TestCase
 
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage File name was not provided and cannot be auto-discovered
-     */
     public function testContentPlainTextWithNoName()
     {
 
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('File name was not provided and cannot be auto-discovered');
+
         $builder = new MultipartBuilder();
 
-        $builder->setBody(array('to' => array('phoneNumber' => 'foo'), 'faxResolution' => 'High'))
+        $builder->setBody(['to' => ['phoneNumber' => 'foo'], 'faxResolution' => 'High'])
                 ->setBoundary('boundary')
                 ->add('plain text');
 
@@ -105,42 +104,40 @@ class MultipartBuilderTest extends TestCase
 
         $builder = new MultipartBuilder();
 
-        $builder->setBody(array('to' => array('phoneNumber' => 'foo'), 'faxResolution' => 'High'))
+        $builder->setBody(['to' => ['phoneNumber' => 'foo'], 'faxResolution' => 'High'])
                 ->setBoundary('boundary')
-                ->add(\GuzzleHttp\Psr7\stream_for('streamed'), 'streamed.txt')
+                ->add(\GuzzleHttp\Psr7\Utils::streamFor('streamed'), 'streamed.txt')
                 ->add(new Stream(fopen($this->fname, 'r')));
 
         $this->assertEquals($expected, (string)$builder->request('/fax')->getBody());
 
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage File name was not provided and cannot be auto-discovered
-     */
     public function testStreamWithNoName()
     {
 
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('File name was not provided and cannot be auto-discovered');
+
         $builder = new MultipartBuilder();
 
-        $builder->setBody(array('to' => array('phoneNumber' => 'foo'), 'faxResolution' => 'High'))
+        $builder->setBody(['to' => ['phoneNumber' => 'foo'], 'faxResolution' => 'High'])
                 ->setBoundary('boundary')
-                ->add(\GuzzleHttp\Psr7\stream_for('streamed'));
+                ->add(\GuzzleHttp\Psr7\Utils::streamFor('streamed'));
 
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Content-Type header was not provided and cannot be auto-discovered
-     */
     public function testStreamWithUnknownExtension()
     {
 
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Content-Type header was not provided and cannot be auto-discovered');
+
         $builder = new MultipartBuilder();
 
-        $builder->setBody(array('to' => array('phoneNumber' => 'foo'), 'faxResolution' => 'High'))
+        $builder->setBody(['to' => ['phoneNumber' => 'foo'], 'faxResolution' => 'High'])
                 ->setBoundary('boundary')
-                ->add(\GuzzleHttp\Psr7\stream_for('streamed'), 'streamed');
+                ->add(\GuzzleHttp\Psr7\Utils::streamFor('streamed'), 'streamed');
 
     }
 
@@ -166,7 +163,7 @@ class MultipartBuilderTest extends TestCase
 
         $builder = new MultipartBuilder();
 
-        $builder->setBody(array('to' => array('phoneNumber' => 'foo'), 'faxResolution' => 'High'))
+        $builder->setBody(['to' => ['phoneNumber' => 'foo'], 'faxResolution' => 'High'])
                 ->setBoundary('boundary')
                 ->add(fopen($this->fname, 'r'));
 
@@ -194,9 +191,9 @@ class MultipartBuilderTest extends TestCase
 
         $builder = new MultipartBuilder();
 
-        $builder->setBody(array('to' => array('phoneNumber' => 'foo'), 'faxResolution' => 'High'))
+        $builder->setBody(['to' => ['phoneNumber' => 'foo'], 'faxResolution' => 'High'])
                 ->setBoundary('boundary')
-                ->add('plain text', 'plain.txt', array('Content-Type' => 'text/custom'));
+                ->add('plain text', 'plain.txt', ['Content-Type' => 'text/custom']);
 
         $request = $builder->request('/fax');
 
@@ -211,7 +208,7 @@ class MultipartBuilderTest extends TestCase
     {
 
         $builder = new MultipartBuilder();
-        $body = array('to' => array('phoneNumber' => 'foo'), 'faxResolution' => 'High');
+        $body = ['to' => ['phoneNumber' => 'foo'], 'faxResolution' => 'High'];
 
         $builder->setBody($body);
 

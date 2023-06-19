@@ -12,7 +12,6 @@ use RingCentral\SDK\SDK;
 
 class Platform
 {
-
     const ACCESS_TOKEN_TTL = 3600; // 60 minutes
     const REFRESH_TOKEN_TTL = 604800; // 1 week
     const TOKEN_ENDPOINT = '/restapi/oauth/token';
@@ -20,12 +19,32 @@ class Platform
     const AUTHORIZE_ENDPOINT = '/restapi/oauth/authorize';
     const API_VERSION = 'v1.0';
     const URL_PREFIX = '/restapi';
+    const KNOWN_PREFIXES = array(
+       self::URL_PREFIX,
+       '/rcvideo', '/video',
+       '/webinar',
+       '/team-messaging',
+       '/analytics',
+       '/ai',
+       '/scim'
+    );
 
+    /** @var string */
     protected $_server;
+
+    /** @var string */
     protected $_clientId;
+
+    /** @var string */
     protected $_clientSecret;
+
+    /** @var string */
     protected $_appName;
+
+    /** @var string */
     protected $_appVersion;
+
+    /** @var string */
     protected $_userAgent;
 
     /** @var Auth */
@@ -34,6 +53,15 @@ class Platform
     /** @var Client */
     protected $_client;
 
+    /**
+     * Platform constructor.
+     * @param Client $client
+     * @param string $clientId
+     * @param string $clientSecret
+     * @param string $server
+     * @param string $appName
+     * @param string $appVersion
+     */
     public function __construct(Client $client, $clientId, $clientSecret, $server, $appName = '', $appVersion = '')
     {
 
@@ -54,6 +82,9 @@ class Platform
 
     }
 
+    /**
+     * @return Auth
+     */
     public function auth()
     {
         return $this->_auth;
@@ -64,17 +95,21 @@ class Platform
      * @param array  $options
      * @return string
      */
-    public function createUrl($path = '', $options = array())
+    public function createUrl($path = '', $options = [])
     {
 
         $builtUrl = '';
         $hasHttp = stristr($path, 'http://') || stristr($path, 'https://');
 
-        if (!empty($options['addServer']) && !$hasHttp) {
+        if (!empty($options['addServer']) && $options['addServer'] == TRUE && !$hasHttp) {
             $builtUrl .= $this->_server;
         }
 
-        if (!stristr($path, self::URL_PREFIX) && !$hasHttp) {
+        if (!array_reduce(self::KNOWN_PREFIXES,
+                          function ($result, $key) use($path) {
+			    if ($result) { return $result; } else { return str_starts_with( $path, $key ); }
+                          },
+                          FALSE) && !$hasHttp) {
             $builtUrl .= self::URL_PREFIX . '/' . self::API_VERSION;
         }
 
@@ -95,7 +130,14 @@ class Platform
 
     }
 
-
+    /**
+     * This function has mixed purposes. On the face of it, it can used to return a boolean value which represents
+     * whether or not the platform has been configured with valid authentication tokens.
+     * However, it also does much more than that. If the access token is expired BUT the refresh token is valid, then
+     * this function takes it upon itself to use that refresh token to automatically request brand new tokens, which it
+     * then sets and uses.
+     * @return bool True if the access token is value OR it is able to request new tokens successfully, otherwise false
+     */
     public function loggedIn()
     {
         try {
@@ -106,66 +148,69 @@ class Platform
     }
 
     /**
-     * @param string $options['redirectUri']
-     * @param string $options['state']
-     * @param string $options['brandId']
-     * @param string $options['display']
-     * @param string $options['prompt']
-     * @param array  $options
-     * @throws ApiException
-     * @return ApiResponse
+     * Create and return a URL that can be used for authenticating/logging in to RingCentral.
+     * @param array $options     An array containing information that will be added to the generated URL.
+     *                           $options = [
+     *                           'redirectUri' => (string) The callback URI to use once authentication is complete.
+     *                           'state'       => (string)
+     *                           'brandId'     => (string)
+     *                           'display'     => (string)
+     *                           'prompt'      => (string)
+     *                           'code_challenge'         => (string) Used to facilitate PKCE auth flows
+     *                           'code_challenge_method'  => (string) Used to facilitate PKCE auth flows
+     *                           ]
+     * @return string
      */
     public function authUrl($options)
     {
-
         return $this->createUrl(self::AUTHORIZE_ENDPOINT . '?' . http_build_query(
-            array (
-            'response_type' => 'code',
-            'redirect_uri'  => $options['redirectUri'] ? $options['redirectUri'] : null,
-            'client_id'     => $this->_clientId,
-            'state'         => $options['state'] ? $options['state'] : null,
-            'brand_id'      => $options['brandId'] ? $options['brandId'] : null,
-            'display'       => $options['display'] ? $options['display'] : null,
-            'prompt'        => $options['prompt'] ? $options['prompt'] : null
-        )), array(
-            'addServer'     => 'true'
-        ));
+                [
+                    'response_type'         => 'code',
+                    'redirect_uri'          => $options['redirectUri'] ? $options['redirectUri'] : null,
+                    'client_id'             => $this->_clientId,
+                    'state'                 => array_key_exists('state',$options) ? $options['state'] : null,
+                    'brand_id'              => array_key_exists('brandId',$options) ? $options['brandId'] : null,
+                    'display'               => array_key_exists('display',$options) ? $options['display'] : null,
+                    'prompt'                => array_key_exists('prompt',$options) ? $options['prompt'] : null,
+                    'code_challenge'        => array_key_exists('code_challenge',$options) ? $options['code_challenge'] : null,
+                    'code_challenge_method' => array_key_exists('code_challenge_method',$options) ? $options['code_challenge_method'] : null
+                ]), [
+            'addServer' => 'true'
+        ]);
     }
 
     /**
-     * @param string  $url
-     * @throws ApiException
-     * @return ApiResponse
+     * @param string $url
+     * @return array
      */
     public function parseAuthRedirectUrl($url)
     {
 
-        parse_str($url,$qsArray);
-        return array(
-                'code' => $qsArray['code']
-        );
+        parse_str($url, $qsArray);
+        return [
+            'code' => $qsArray['code']
+        ];
     }
-
 
     /**
      * @param string $username
      * @param string $extension
      * @param string $password
-     * @throws ApiException
      * @return ApiResponse
+     * @throws Exception    If it fails to retrieve/parse JSON data from he response.
+     * @throws ApiException If there is an issue with the token request.
      */
     public function login($options)
     {
-
-        if(is_string($options)){
-           $options = array(
-                            'username'  => func_get_arg(0),
-                            'extension' => func_get_arg(1) ? func_get_arg(1) : null,
-                            'password'  => func_get_arg(2)
-                            );
+        if (is_string($options)) {
+            $options = [
+                'username'  => func_get_arg(0),
+                'extension' => func_get_arg(1) ? func_get_arg(1) : null,
+                'password'  => func_get_arg(2)
+            ];
         }
 
-        $response = !empty($options['code']) ? $this->requestToken(self::TOKEN_ENDPOINT, array(
+        $response = !empty($options['code']) ? $this->requestToken(self::TOKEN_ENDPOINT, [
 
             'grant_type'        => 'authorization_code',
             'code'              => $options['code'],
@@ -173,7 +218,16 @@ class Platform
             'access_token_ttl'  => self::ACCESS_TOKEN_TTL,
             'refresh_token_ttl' => self::REFRESH_TOKEN_TTL
 
-        )) :$this->requestToken(self::TOKEN_ENDPOINT, array(
+            ] + (!empty($options['codeVerifier']) ? [ 'code_verifier' => $options['codeVerifier'] ] : [])
+
+	) : (!empty($options['jwt']) ? $this->requestToken(self::TOKEN_ENDPOINT, [
+
+            'grant_type'        => 'urn:ietf:params:oauth:grant-type:jwt-bearer',
+            'assertion'         => $options['jwt'],
+            'access_token_ttl'  => self::ACCESS_TOKEN_TTL,
+            'refresh_token_ttl' => self::REFRESH_TOKEN_TTL
+
+        ]) : $this->requestToken(self::TOKEN_ENDPOINT, [
 
             'grant_type'        => 'password',
             'username'          => $options['username'],
@@ -182,7 +236,7 @@ class Platform
             'access_token_ttl'  => self::ACCESS_TOKEN_TTL,
             'refresh_token_ttl' => self::REFRESH_TOKEN_TTL
 
-        ));
+	]));
 
         $this->_auth->setData($response->jsonArray());
 
@@ -191,8 +245,10 @@ class Platform
     }
 
     /**
+     * Attempt to request new access and refresh tokens using the existing refresh token.
      * @return ApiResponse
-     * @throws ApiException
+     * @throws Exception    If it fails to retrieve/parse JSON data from he response.
+     * @throws ApiException If the existing refresh token is invalid or there is an issue with the request.
      */
     public function refresh()
     {
@@ -202,12 +258,12 @@ class Platform
         }
 
         // Synchronous
-        $response = $this->requestToken(self::TOKEN_ENDPOINT, array(
+        $response = $this->requestToken(self::TOKEN_ENDPOINT, [
             "grant_type"        => "refresh_token",
             "refresh_token"     => $this->_auth->refreshToken(),
             "access_token_ttl"  => self::ACCESS_TOKEN_TTL,
             "refresh_token_ttl" => self::REFRESH_TOKEN_TTL
-        ));
+        ]);
 
         $this->_auth->setData($response->jsonArray());
 
@@ -217,14 +273,15 @@ class Platform
 
     /**
      * @return ApiResponse
-     * @throws ApiException
+     * @throws Exception    If an error occurs parsing the response from the request.
+     * @throws ApiException If an error occurs making the request.
      */
     public function logout()
     {
 
-        $response = $this->requestToken(self::REVOKE_ENDPOINT, array(
+        $response = $this->requestToken(self::REVOKE_ENDPOINT, [
             'token' => $this->_auth->accessToken()
-        ));
+        ]);
 
         $this->_auth->reset();
 
@@ -233,15 +290,16 @@ class Platform
     }
 
     /**
-     * Convenience helper used for processing requests (even externally created)
-     * Performs access token refresh if needed
+     * Convenience helper used for processing requests (even externally created).
+     * Performs access token refresh if needed.
      * Then adds Authorization header and API server to URI
      * @param RequestInterface $request
      * @param array            $options
-     * @throws ApiException
      * @return RequestInterface
+     * @throws Exception    If an error occurs parsing the response from the refresh request.
+     * @throws ApiException If an error occurs making the refresh request.
      */
-    public function inflateRequest(RequestInterface $request, $options = array())
+    public function inflateRequest(RequestInterface $request, $options = [])
     {
 
         if (empty($options['skipAuthCheck'])) {
@@ -257,7 +315,7 @@ class Platform
         $request = $request->withAddedHeader('User-Agent', $this->_userAgent)
                            ->withAddedHeader('RC-User-Agent', $this->_userAgent);
 
-        $uri = new Uri($this->createUrl((string)$request->getUri(), array('addServer' => true)));
+        $uri = new Uri($this->createUrl((string)$request->getUri(), ['addServer' => true]));
 
         return $request->withUri($uri);
 
@@ -267,10 +325,11 @@ class Platform
      * Method sends the request (even externally created) to API server using client
      * @param RequestInterface $request
      * @param array            $options
-     * @throws ApiException
      * @return ApiResponse
+     * @throws Exception    If an error occurs parsing the response from the refresh request as part of inflateRequest()
+     * @throws ApiException If an error occurs making the refresh request as part of inflateRequest()
      */
-    public function sendRequest(RequestInterface $request, $options = array())
+    public function sendRequest(RequestInterface $request, $options = [])
     {
 
         return $this->_client->send($this->inflateRequest($request, $options));
@@ -282,13 +341,16 @@ class Platform
      * @param array  $queryParameters
      * @param array  $headers
      * @param array  $options
-     * @throws ApiException
      * @return ApiResponse
+     * @throws Exception    If an error occurs parsing the response from the request.
+     * @throws ApiException If an error occurs making the request.
      */
-    public function get($url = '', $queryParameters = array(), array $headers = array(), $options = array())
+    public function get($url = '', $queryParameters = [], array $headers = [], $options = [])
     {
-        return $this->sendRequest($this->_client->createRequest('GET', $url, $queryParameters, null, $headers),
-            $options);
+        return $this->sendRequest(
+            $this->_client->createRequest('GET', $url, $queryParameters, null, $headers),
+            $options
+        );
     }
 
     /**
@@ -297,18 +359,21 @@ class Platform
      * @param array  $queryParameters
      * @param array  $headers
      * @param array  $options
-     * @throws ApiException
      * @return ApiResponse
+     * @throws Exception    If an error occurs parsing the response from the request.
+     * @throws ApiException If an error occurs making the request.
      */
     public function post(
         $url = '',
         $body = null,
-        $queryParameters = array(),
-        array $headers = array(),
-        $options = array()
+        $queryParameters = [],
+        array $headers = [],
+        $options = []
     ) {
-        return $this->sendRequest($this->_client->createRequest('POST', $url, $queryParameters, $body, $headers),
-            $options);
+        return $this->sendRequest(
+            $this->_client->createRequest('POST', $url, $queryParameters, $body, $headers),
+            $options
+        );
     }
 
     /**
@@ -317,18 +382,44 @@ class Platform
      * @param array  $queryParameters
      * @param array  $headers
      * @param array  $options
-     * @throws ApiException
      * @return ApiResponse
+     * @throws Exception    If an error occurs parsing the response from the request.
+     * @throws ApiException If an error occurs making the request.
+     */
+    public function patch(
+        $url = '',
+        $body = null,
+        $queryParameters = [],
+        array $headers = [],
+        $options = []
+    ) {
+        return $this->sendRequest(
+            $this->_client->createRequest('PATCH', $url, $queryParameters, $body, $headers),
+            $options
+        );
+    }
+
+    /**
+     * @param string $url
+     * @param array  $body
+     * @param array  $queryParameters
+     * @param array  $headers
+     * @param array  $options
+     * @return ApiResponse
+     * @throws Exception    If an error occurs parsing the response from the request.
+     * @throws ApiException If an error occurs making the request.
      */
     public function put(
         $url = '',
         $body = null,
-        $queryParameters = array(),
-        array $headers = array(),
-        $options = array()
+        $queryParameters = [],
+        array $headers = [],
+        $options = []
     ) {
-        return $this->sendRequest($this->_client->createRequest('PUT', $url, $queryParameters, $body, $headers),
-            $options);
+        return $this->sendRequest(
+            $this->_client->createRequest('PUT', $url, $queryParameters, $body, $headers),
+            $options
+        );
     }
 
     /**
@@ -336,44 +427,65 @@ class Platform
      * @param array  $queryParameters
      * @param array  $headers
      * @param array  $options
-     * @throws ApiException
      * @return ApiResponse
+     * @throws Exception    If an error occurs parsing the response from the request.
+     * @throws ApiException If an error occurs making the request.
      */
-    public function delete($url = '', $queryParameters = array(), array $headers = array(), $options = array())
+    public function delete($url = '', $queryParameters = [], array $headers = [], $options = [])
     {
-        return $this->sendRequest($this->_client->createRequest('DELETE', $url, $queryParameters, null, $headers),
-            $options);
+        return $this->sendRequest(
+            $this->_client->createRequest('DELETE', $url, $queryParameters, null, $headers),
+            $options
+        );
     }
 
     /**
      * @param string $path
      * @param array  $body
      * @return ApiResponse
+     * @throws Exception    If an error occurs parsing the response from the request.
+     * @throws ApiException If an error occurs making the request.
      */
-    protected function requestToken($path = '', $body = array())
+    protected function requestToken($path = '', $body = [])
     {
-
-        $headers = array(
+        if (!empty($body['grant_type']) && $body['grant_type'] == 'password') {
+            trigger_error(
+                'Username/password authentication is deprecated. Please migrate to the JWT grant type.',
+                E_USER_DEPRECATED
+            );
+        }
+        $headers = [
             'Authorization' => 'Basic ' . $this->apiKey(),
             'Content-Type'  => 'application/x-www-form-urlencoded'
-        );
+        ];
 
         $request = $this->_client->createRequest('POST', $path, null, $body, $headers);
 
-        return $this->sendRequest($request, array('skipAuthCheck' => true));
+        return $this->sendRequest($request, ['skipAuthCheck' => true]);
 
     }
 
+    /**
+     * @return string
+     */
     protected function apiKey()
     {
         return base64_encode($this->_clientId . ':' . $this->_clientSecret);
     }
 
+    /**
+     * @return string
+     */
     protected function authHeader()
     {
         return $this->_auth->tokenType() . ' ' . $this->_auth->accessToken();
     }
 
+    /**
+     * @return void
+     * @throws Exception    If an error occurs parsing the response from the refresh request.
+     * @throws ApiException If an error occurs making the refresh request.
+     */
     protected function ensureAuthentication()
     {
         if (!$this->_auth->accessTokenValid()) {

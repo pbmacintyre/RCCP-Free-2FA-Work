@@ -12,13 +12,16 @@ use PubNub\Enums\PNOperationType;
 
 class Grant extends Endpoint
 {
-    const PATH = "/v1/auth/grant/sub-key/%s";
+    const PATH = "/v2/auth/grant/sub-key/%s";
 
     /** @var string[] */
     protected $authKeys = [];
 
     /** @var string[] */
     protected $channels = [];
+
+    /** @var string[] */
+    protected $uuids = [];
 
     /** @var string[] */
     protected $groups = [];
@@ -31,6 +34,18 @@ class Grant extends Endpoint
 
     /** @var  bool */
     protected $manage;
+
+    /** @var  bool */
+    protected $delete;
+
+    /** @var  bool */
+    protected $get;
+
+    /** @var  bool */
+    protected $update;
+
+    /** @var  bool */
+    protected $join;
 
     /** @var  int */
     protected $ttl;
@@ -52,6 +67,16 @@ class Grant extends Endpoint
     public function channels($channels)
     {
         $this->channels = PubNubUtil::extendArray($this->channels, $channels);
+        return $this;
+    }
+
+    /**
+     * @param string|string[] $uuids
+     * @return $this
+     */
+    public function uuids($uuids)
+    {
+        $this->uuids = PubNubUtil::extendArray($this->uuids, $uuids);
         return $this;
     }
 
@@ -100,6 +125,50 @@ class Grant extends Endpoint
     }
 
     /**
+     * @param bool $flag
+     * @return $this
+     */
+    public function delete($flag)
+    {
+        $this->delete = $flag;
+
+        return $this;
+    }
+
+    /**
+     * @param bool $flag
+     * @return $this
+     */
+    public function get($flag)
+    {
+        $this->get = $flag;
+
+        return $this;
+    }
+
+    /**
+     * @param bool $flag
+     * @return $this
+     */
+    public function update($flag)
+    {
+        $this->update = $flag;
+
+        return $this;
+    }
+
+    /**
+     * @param bool $flag
+     * @return $this
+     */
+    public function join($flag)
+    {
+        $this->join = $flag;
+
+        return $this;
+    }
+
+    /**
      * Set time in minutes for which granted permissions are valid
      *
      * Max: 525600
@@ -126,7 +195,7 @@ class Grant extends Endpoint
         $this->validateSubscribeKey();
         $this->validateSecretKey();
 
-        if ($this->write === null && $this->read === null && $this->manage === null) {
+        if ($this->write === null && $this->read === null && $this->manage === null && $this->get === null && $this->update === null && $this->join === null) {
             throw new PubNubValidationException("At least one flag should be specified");
         }
     }
@@ -150,12 +219,32 @@ class Grant extends Endpoint
             $params["m"] = ($this->manage) ? "1" : "0";
         }
 
+        if ($this->delete !== null) {
+            $params["d"] = ($this->delete) ? "1" : "0";
+        }
+
+        if ($this->get !== null) {
+            $params["g"] = ($this->get) ? "1" : "0";
+        }
+
+        if ($this->update !== null) {
+            $params["u"] = ($this->update) ? "1" : "0";
+        }
+
+        if ($this->join !== null) {
+            $params["j"] = ($this->join) ? "1" : "0";
+        }
+
         if (count($this->authKeys) > 0) {
             $params["auth"] = PubNubUtil::joinItems($this->authKeys);
         }
 
         if (count($this->channels) > 0) {
             $params["channel"] = PubNubUtil::joinItems($this->channels);
+        }
+
+        if (count($this->uuids) > 0) {
+            $params["target-uuid"] = PubNubUtil::joinItems($this->uuids);
         }
 
         if (count($this->groups) > 0) {
@@ -226,6 +315,14 @@ class Grant extends Endpoint
     public function getAffectedChannelGroups()
     {
         return $this->groups;
+    }
+
+    /**
+     * @return \string[]
+     */
+    public function getAffectedUsers()
+    {
+        return $this->uuids;
     }
 
     /**

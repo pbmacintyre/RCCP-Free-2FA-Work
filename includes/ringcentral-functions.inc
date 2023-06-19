@@ -66,11 +66,12 @@ function ringcentral_validate_sdk($rc_handshake) {
         $sdk = new RingCentral\SDK\SDK($rc_handshake['client_id'], 
             $rc_handshake['client_secret'], RingCentral\SDK\SDK::SERVER_PRODUCTION);        
     }
-    
+    show_errors();
     // attempt to Login via API
     try {
-        $sdk->platform()->login($rc_handshake['user_name'], $rc_handshake['extension'], 
-            $rc_handshake['password']);
+//        $sdk->platform()->login($rc_handshake['user_name'], $rc_handshake['extension'],
+//            $rc_handshake['password']);
+        $sdk->platform()->login( [ "jwt" => $rc_handshake['jwt_key'] ] );
         $result = true ;        
     } catch (\RingCentral\SDK\Http\ApiException $e) {
         $result = false ;

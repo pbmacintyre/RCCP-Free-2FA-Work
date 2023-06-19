@@ -101,7 +101,7 @@ class PubNubUtil
      */
     public static function splitItems($itemsString)
     {
-        if (strlen($itemsString) == 0) {
+        if (strlen((string)$itemsString) === 0) {
             return [];
         } else {
             return explode(",", $itemsString);
@@ -113,17 +113,24 @@ class PubNubUtil
         if (function_exists('com_create_guid') === true) {
             return trim(com_create_guid(), '{}');
         } else {
-            return sprintf('%04X%04X-%04X-%04X-%04X-%04X%04X%04X', mt_rand(0, 65535), mt_rand(0, 65535),
-                mt_rand(0, 65535), mt_rand(16384, 20479), mt_rand(32768, 49151), mt_rand(0, 65535), mt_rand(0, 65535),
-                mt_rand(0, 65535));
+            return sprintf(
+                '%04X%04X-%04X-%04X-%04X-%04X%04X%04X',
+                mt_rand(0, 65535),
+                mt_rand(0, 65535),
+                mt_rand(0, 65535),
+                mt_rand(16384, 20479),
+                mt_rand(32768, 49151),
+                mt_rand(0, 65535),
+                mt_rand(0, 65535),
+                mt_rand(0, 65535)
+            );
         }
     }
 
     public static function preparePamParams($params)
     {
-        ksort($params);
-
         $sortedParams = $params;
+        ksort($sortedParams);
         $stringifiedArguments = "";
         $index = 0;
 
@@ -166,8 +173,8 @@ class PubNubUtil
     {
         $result = strtr(base64_encode(hash_hmac(
             'sha256',
-            utf8_encode($signInput),
-            utf8_encode($secret),
+            self::convertIso8859ToUtf8($signInput),
+            self::convertIso8859ToUtf8($secret),
             true
         )), '+/', '-_');
 
@@ -179,6 +186,10 @@ class PubNubUtil
         $r = null;
         $w = null;
         $m = null;
+        $d = null;
+        $g = null;
+        $u = null;
+        $j = null;
         $ttl = null;
 
         if (array_key_exists('r', $jsonInput)) {
@@ -193,18 +204,36 @@ class PubNubUtil
             $m = $jsonInput['m'] === 1;
         }
 
+        if (array_key_exists('d', $jsonInput)) {
+            $d = $jsonInput['d'] === 1;
+        }
+
+        if (array_key_exists('g', $jsonInput)) {
+            $g = $jsonInput['g'] === 1;
+        }
+
+        if (array_key_exists('u', $jsonInput)) {
+            $u = $jsonInput['u'] === 1;
+        }
+
+        if (array_key_exists('j', $jsonInput)) {
+            $j = $jsonInput['j'] === 1;
+        }
+
         if (array_key_exists('ttl', $jsonInput)) {
             $ttl = (int) $jsonInput['ttl'];
         }
 
-        return [$r, $w, $m, $ttl];
+        return [$r, $w, $m, $d, $g, $u, $j, $ttl];
     }
 
     public static function isAssoc($arr)
     {
-        if (!is_array($arr)) return false;
+        if (!is_array($arr)) {
+            return false;
+        }
 
-        return array_keys($arr) !== range(0, count($arr) -1 );
+        return array_keys($arr) !== range(0, count($arr) - 1);
     }
 
     /**
@@ -218,7 +247,38 @@ class PubNubUtil
     {
         $str_len = strlen($string);
         $suffix_len = strlen($suffix);
-        if ($suffix_len > $str_len) return false;
+        if ($suffix_len > $str_len) {
+            return false;
+        }
         return substr_compare($string, $suffix, $str_len - $suffix_len, $suffix_len) === 0;
+    }
+
+    public static function tokenEncode($token)
+    {
+        return str_replace('+', '%20', urlencode($token));
+    }
+
+    public static function convertIso8859ToUtf8($iso_string)
+    {
+        $iso_string .= $iso_string;
+        $len = strlen($iso_string);
+
+        for ($i = $len >> 1, $j = 0; $i < $len; ++$i, ++$j) {
+            switch (true) {
+                case $iso_string[$i] < "\x80":
+                    $iso_string[$j] = $iso_string[$i];
+                    break;
+                case $iso_string[$i] < "\xC0":
+                    $iso_string[$j] = "\xC2";
+                    $iso_string[++$j] = $iso_string[$i];
+                    break;
+                default:
+                    $iso_string[$j] = "\xC3";
+                    $iso_string[++$j] = chr(ord($iso_string[$i]) - 64);
+                    break;
+            }
+        }
+
+        return substr($iso_string, 0, $j);
     }
 }

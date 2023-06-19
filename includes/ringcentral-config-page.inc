@@ -162,7 +162,22 @@ Function show_form($message, $label = "", $color = "#008EC2") {
           <!--  <button type="button" onmousedown="reveal_it();" >Toggle Passwords</button> -->     
             <button type="button" onmouseout="hide_it();" onmousedown="reveal_it();" onmouseup="hide_it();">Reveal Tokens</button>
         </td>
-    </tr>   
+    </tr>
+    <tr class="TableOverride">
+        <td class="left_col">
+            <p style='display: inline; <?php if ($label == "client_id") echo "color:red"; ?>' >JWT Key:</p>
+            <p style='color: red; display: inline'>*</p>
+        </td>
+        <td class="right_col"><input type="text" name="jwt_key" value="<?php
+            if ($print_again) {
+                echo sanitize_text_field($_POST['jwt_key']);
+            } else {
+                if ($result_rc->jwt_key) {
+                    echo $result_rc->jwt_key ;
+                }
+            }
+            ?>"></td>
+    </tr>
     <tr class="TableOverride">
 		<td class="left_col">
 			<p style='display: inline; <?php if ($label == "client_id") echo "color:red"; ?>' >Client ID:</p>
@@ -174,8 +189,6 @@ Function show_form($message, $label = "", $color = "#008EC2") {
           } else {             
               if ($result_rc->client_id) {
                   echo $result_rc->client_id ;
-              } else {
-                echo "&nbsp;" ;  
               }
           }
             ?>"></td>
@@ -341,6 +354,7 @@ Function check_form() {
 	}    
 	
 	$rc_handshake = array(
+	    "jwt_key"          => sanitize_text_field($_POST['jwt_key']),
 	    "client_id"        => sanitize_text_field($_POST['client_id']),
 	    "client_secret"    => sanitize_text_field($_POST['client_secret']),
 	    "user_name"        => sanitize_text_field($_POST['ringcentral_user_name']) ,
@@ -357,7 +371,12 @@ Function check_form() {
 	    $label = "";
 	    $message = "There was an error validating your Ring Central account credentials, please verify and try again";
 	}
-	if ($rc_handshake["client_id"] == "") {
+    if ($rc_handshake["jwt_key"] == "") {
+        $print_again = true;
+        $label = "jwt_key";
+        $message = "The JWT Key cannot be blank.";
+    }
+    if ($rc_handshake["client_id"] == "") {
 	    $print_again = true;
 	    $label = "client_id";
 	    $message = "Client ID cannot be blank.";
@@ -457,12 +476,13 @@ Function check_form() {
 //         $oauth_client = $_POST['oauth_client'] ;
 //         $oauth_secret = $_POST['oauth_secret'] ;
 
-        $config_sql = $wpdb->prepare("UPDATE `ringcentral_control` SET
+        $config_sql = $wpdb->prepare("UPDATE `ringcentral_control` SET `jwt_key` = %s, 
             `embedded_phone` = %d, `email_updates` = %d, `mobile_updates` = %d, `client_id` = %s, `client_secret` = %s,
             `ringcentral_user_name` = %s, `ringcentral_extension` = %d, `ringcentral_password` = %s, `ringcentral_sandbox` = %d,
         	`enable_glip` = %d, `embed_width` = %d,`embed_height` = %d,	
             `grc_site_key` = %s, `grc_secret_key` = %s, `token_prefix` = %s
-            WHERE `ringcentral_control_id` = %d", $embedded_phone, $email_updates, $mobile_updates, $rc_handshake['client_id'], $rc_handshake['client_secret'], 
+            WHERE `ringcentral_control_id` = %d", $rc_handshake['jwt_key'], $embedded_phone, $email_updates, $mobile_updates,
+            $rc_handshake['client_id'], $rc_handshake['client_secret'],
             $rc_handshake['user_name'], $rc_handshake['extension'], $rc_handshake['password'], $sandbox,
         	$enable_glip, $embed_width, $embed_height,	 
             $GRCSite, $GRCSecret, $token_prefix, 1) ;

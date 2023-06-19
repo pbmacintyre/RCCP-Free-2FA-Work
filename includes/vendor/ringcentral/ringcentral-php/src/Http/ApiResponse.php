@@ -93,8 +93,10 @@ class ApiResponse
     /**
      * Parses response body as JSON and returns an array
      * Result is cached internally
-     * @return array
+     *
      * @throws Exception
+     *
+     * @return array
      */
     public function jsonArray()
     {
@@ -121,7 +123,7 @@ class ApiResponse
 
         if (empty($this->_multiparts)) {
 
-            $this->_multiparts = array();
+            $this->_multiparts = [];
 
             if (!$this->isContentType('multipart/mixed')) {
                 throw new Exception('Response is not multipart');
@@ -141,7 +143,7 @@ class ApiResponse
 
             $parts = explode('--' . $boundary . '', $this->text()); //TODO Handle as stream
 
-            if (empty($parts[0])) {
+            if (empty(trim($parts[0]))) {
                 array_shift($parts);
             }
 
@@ -265,7 +267,7 @@ class ApiResponse
             $body = "HTTP/1.1 " . $status . " Foo\r\n" . $body;
         }
 
-        $response = \GuzzleHttp\Psr7\parse_response((string)$body);
+        $response = \GuzzleHttp\Psr7\Message::parseResponse((string)$body);
 
         return $response->withStatus($status);
 

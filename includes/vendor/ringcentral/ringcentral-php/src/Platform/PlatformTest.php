@@ -17,19 +17,31 @@ class PlatformTest extends TestCase
 
     }
 
-    /**
-     * @expectedException \Exception
-     * @expectedExceptionMessage Refresh token has expired
-     */
+    public function testLoginWithPassword()
+    {
+        $sdk = $this->getSDK(
+            [
+                $this->authenticationMock(),
+            ],
+            false
+        );
+        $sdk->platform()->login('username', 'extension', 'password');
+        $authData = $sdk->platform()->auth()->data();
+        $this->assertTrue(!empty($authData['access_token']));
+    }
+
     public function testRefreshWithOutdatedToken()
     {
 
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Refresh token has expired');
+
         $sdk = $this->getSDK();
 
-        $sdk->platform()->auth()->setData(array(
+        $sdk->platform()->auth()->setData([
             'refresh_token_expires_in'  => 1,
             'refresh_token_expire_time' => 1
-        ));
+        ]);
 
         $sdk->platform()->refresh();
 
@@ -38,15 +50,15 @@ class PlatformTest extends TestCase
     public function testAutomaticRefresh()
     {
 
-        $sdk = $this->getSDK(array(
+        $sdk = $this->getSDK([
             $this->refreshMock(),
-            $this->createResponse('GET', '/foo', array('foo' => 'bar'))
-        ));
+            $this->createResponse('GET', '/foo', ['foo' => 'bar'])
+        ]);
 
-        $sdk->platform()->auth()->setData(array(
+        $sdk->platform()->auth()->setData([
             'expires_in'  => 1,
             'expire_time' => 1
-        ));
+        ]);
 
         $this->assertEquals('bar', $sdk->platform()->get('/foo')->json()->foo);
 
@@ -58,9 +70,9 @@ class PlatformTest extends TestCase
     public function testLogout()
     {
 
-        $sdk = $this->getSDK(array(
+        $sdk = $this->getSDK([
             $this->logoutMock()
-        ));
+        ]);
 
         $sdk->platform()->logout();
 
@@ -71,27 +83,65 @@ class PlatformTest extends TestCase
 
     }
 
+    public function testAuthUrl()
+    {
+        $sdk = $this->getSDK();
+	$url = $sdk->platform()->authUrl(array(
+	   'redirectUri' => 'foo',
+	   'state' => 'bar',
+	   'client_id' => 'baz'
+	));
+	$this->assertEquals( $url, "https://whatever/restapi/oauth/authorize?response_type=code&redirect_uri=foo&client_id=whatever&state=bar" );
+    }
+    
     public function testApiUrl()
     {
-
         $sdk = $this->getSDK();
 
         $this->assertEquals(
             'https://whatever/restapi/v1.0/account/~/extension/~?_method=POST&access_token=ACCESS_TOKEN',
-            $sdk->platform()->createUrl('/account/~/extension/~', array(
+            $sdk->platform()->createUrl('/account/~/extension/~', [
                 'addServer' => true,
                 'addMethod' => 'POST',
                 'addToken'  => true
-            ))
+            ])
+        );
+
+        $this->assertEquals(
+            'https://whatever/restapi/v1.0/account/~/extension/~',
+            $sdk->platform()->createUrl('/account/~/extension/~', [
+                'addServer' => true
+	    ])
+        );
+	
+        $this->assertEquals(
+            'https://whatever/rcvideo/v2/account/~/extension/~/bridges',
+	    $sdk->platform()->createUrl('/rcvideo/v2/account/~/extension/~/bridges', [
+                'addServer' => true
+            ])
+        );
+
+        $this->assertEquals(
+            'https://whatever/scim/v2/ServiceProviderConfig',
+            $sdk->platform()->createUrl('/scim/v2/ServiceProviderConfig', [
+                'addServer' => true
+            ])
+        );
+
+        $this->assertEquals(
+            'https://whatever/analytics/phone/performance/v1/accounts/accountId/calls/aggregate',
+            $sdk->platform()->createUrl('/analytics/phone/performance/v1/accounts/accountId/calls/aggregate', [
+                'addServer' => true
+            ])
         );
 
         $this->assertEquals(
             'https://foo/account/~/extension/~?_method=POST&access_token=ACCESS_TOKEN',
-            $sdk->platform()->createUrl('https://foo/account/~/extension/~', array(
+            $sdk->platform()->createUrl('https://foo/account/~/extension/~', [
                 'addServer' => true,
                 'addMethod' => 'POST',
                 'addToken'  => true
-            ))
+            ])
         );
 
     }
@@ -99,9 +149,9 @@ class PlatformTest extends TestCase
     public function testProcessRequest()
     {
 
-        $sdk = $this->getSDK(array(
-            $this->createResponse('GET', '/foo', array('foo' => 'bar'))
-        ));
+        $sdk = $this->getSDK([
+            $this->createResponse('GET', '/foo', ['foo' => 'bar'])
+        ]);
 
         $request = $sdk->platform()->inflateRequest(new Request('GET', '/foo'));
 
@@ -110,8 +160,8 @@ class PlatformTest extends TestCase
         $this->assertEquals($request->getHeaderLine('User-Agent'), $request->getHeaderLine('RC-User-Agent'));
 
         $this->assertTrue(!!$request->getHeaderLine('User-Agent'));
-        $this->assertContains('RCPHPSDK/' . SDK::VERSION, $request->getHeaderLine('User-Agent'));
-        $this->assertContains('SDKTests/' . SDK::VERSION, $request->getHeaderLine('User-Agent'));
+        $this->assertStringContainsString('RCPHPSDK/' . SDK::VERSION, $request->getHeaderLine('User-Agent'));
+        $this->assertStringContainsString('SDKTests/' . SDK::VERSION, $request->getHeaderLine('User-Agent'));
 
     }
 
