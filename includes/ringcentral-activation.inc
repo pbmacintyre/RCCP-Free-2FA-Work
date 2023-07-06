@@ -14,7 +14,7 @@ require_once (ABSPATH . 'wp-admin/includes/upgrade.php');
 $ringcentral_sql = "CREATE TABLE `ringcentral_control` (
   `ringcentral_control_id` int(11) NOT NULL AUTO_INCREMENT,
   `embedded_phone` tinyint(4) NOT NULL,
-  `jwt_key` varchar(50) NOT NULL,
+  `jwt_key` text NOT NULL,
   `client_id` varchar(50) NOT NULL,
   `client_secret` varchar(50) NOT NULL,
   `ringcentral_user_name` varchar(50) NOT NULL,
@@ -46,8 +46,8 @@ if (!$row_exists) {
             'ringcentral_control_id' => 1,
             'embedded_phone' => 0,
             'ringcentral_sandbox' => 1,            
-            'embed_width' => 300,            
-            'embed_height' => 600,            
+//            'embed_width' => 300,
+//            'embed_height' => 600,
             'email_updates' => 1,            
             'mobile_updates' => 0,            
             )

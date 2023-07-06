@@ -22,10 +22,9 @@ function ringcentral_dump_obj($object) {
 }
 function echo_spaces($text, $value="", $count = 50) {
     for ($i = 1; $i <= $count; $i++) echo "&nbsp;" ;
-    if (is_string($value)) echo "<br /><strong><p style='color: red; display: inline'>$text:</p></strong> " . $value . "<br />";
-    if (is_object($value)) {
-        echo "<strong><p style='color: red;'>" . $text . " </p></strong><br/>" ;
-        ringcentral_dump_obj($value) ;
-    }
+    echo "<br /><strong><p style='color: red; display: inline'>$text:</p></strong> " ;
+    if (is_string($value)) { $value; }
+    if (is_object($value) || is_array($value)) ringcentral_dump_obj($value);
+    echo "<br />" ;
 }
 ?>

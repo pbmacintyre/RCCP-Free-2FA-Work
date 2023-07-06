@@ -112,42 +112,6 @@ Function show_form($message, $label = "", $color = "#008EC2") {
           }
             ?>></td>
     </tr>
-	<?php /* ==============================================  ?>	
-	<tr class="TableOverride">
-		<td class="left_col">
-			<p style='display: inline; <?php if ($label == "oauth_client") echo "color:red"; ?>' >OAuth Client Key:</p>
-			<p style='color: red; display: inline'>*</p>
-		</td>
-		<td class="right_col"><input type="text" name="oauth_client" value="<?php 
-		  if ($print_again) {
-		      echo $_POST['oauth_client'];
-          } else {             
-              if ($result_rc->oauth_client) {
-                echo $result_rc->oauth_client ;
-              } else {
-                echo "&nbsp; test " ;  
-              }
-          }
-            ?>"></td>
-	</tr>	
-	<tr class="TableOverride">
-		<td class="left_col">
-			<p style='display: inline; <?php if ($label == "oauth_secret") echo "color:red"; ?>' >OAuth Secret Key:</p>
-			<p style='color: red; display: inline'>*</p>
-		</td>
-		<td class="right_col"><input type="password" name="oauth_secret" value="<?php 
-		  if ($print_again) {
-		      echo $_POST['oauth_secret'];
-          } else {             
-              if ($result_rc->oauth_secret) {
-                  echo $result_rc->oauth_secret ;
-              } else {
-                  echo "&nbsp;" ;
-              } 
-          }
-            ?>"></td>
-	</tr>	
-	<?php /* ============================================== */ ?>
     <tr>
         <td colspan=2>
         	<hr>
@@ -165,10 +129,10 @@ Function show_form($message, $label = "", $color = "#008EC2") {
     </tr>
     <tr class="TableOverride">
         <td class="left_col">
-            <p style='display: inline; <?php if ($label == "client_id") echo "color:red"; ?>' >JWT Key:</p>
+            <p style='display: inline; <?php if ($label == "jwt_key") echo "color:red"; ?>' >JWT Key:</p>
             <p style='color: red; display: inline'>*</p>
         </td>
-        <td class="right_col"><input type="text" name="jwt_key" value="<?php
+        <td class="right_col"><textarea name="jwt_key" rows="5"><?php
             if ($print_again) {
                 echo sanitize_text_field($_POST['jwt_key']);
             } else {
@@ -176,7 +140,8 @@ Function show_form($message, $label = "", $color = "#008EC2") {
                     echo $result_rc->jwt_key ;
                 }
             }
-            ?>"></td>
+                ?></textarea>
+        </td>
     </tr>
     <tr class="TableOverride">
 		<td class="left_col">
@@ -353,50 +318,54 @@ Function check_form() {
 	    $sandbox = 0;
 	}    
 	
-	$rc_handshake = array(
+	$form_data = array(
 	    "jwt_key"          => sanitize_text_field($_POST['jwt_key']),
 	    "client_id"        => sanitize_text_field($_POST['client_id']),
+	    //"client_id"        => '2F8P8KXOVj7fk8uKqeLHqX',
+//	    "client_secret"    => '9D0OrBJGOfkbiTVMIagkMnXm8LuWAdv3xfx64A8vjGQS',
 	    "client_secret"    => sanitize_text_field($_POST['client_secret']),
 	    "user_name"        => sanitize_text_field($_POST['ringcentral_user_name']) ,
 	    "extension"        => sanitize_text_field($_POST['ringcentral_extension']) ,
 	    "password"         => sanitize_text_field($_POST['ringcentral_password']) , 	    
 	    "sandbox"          => $sandbox 	    
 	);
+    echo_spaces("form data", $form_data);
+
 	$GRCSite   = $_POST["recaptcha_site"] ;
 	$GRCSecret = $_POST["recaptcha_secret"] ;
 	
 // 	/* data integrity checks */	
-	if (ringcentral_validate_sdk($rc_handshake) == false) {
+	if (!ringcentral_sdk($form_data) ) {
 	    $print_again = true;
 	    $label = "";
 	    $message = "There was an error validating your Ring Central account credentials, please verify and try again";
 	}
-    if ($rc_handshake["jwt_key"] == "") {
+    if ($form_data["jwt_key"] == "") {
         $print_again = true;
         $label = "jwt_key";
         $message = "The JWT Key cannot be blank.";
     }
-    if ($rc_handshake["client_id"] == "") {
+    if ($form_data["client_id"] == "") {
 	    $print_again = true;
 	    $label = "client_id";
 	    $message = "Client ID cannot be blank.";
 	}	
-	if ($rc_handshake["client_secret"] == "") {
+	if ($form_data["client_secret"] == "") {
 	    $print_again = true;
 	    $label = "client_secret";
 	    $message = "Client Secret Key cannot be blank.";
 	}
-	if ($rc_handshake["user_name"] == "") {
+	if ($form_data["user_name"] == "") {
 	    $print_again = true;
 	    $label = "ringcentral_user_name";
 	    $message = "RingCentral User Name cannot be blank.";
 	}
-	if ($rc_handshake["extension"] == "") {
+	if ($form_data["extension"] == "") {
 	    $print_again = true;
 	    $label = "ringcentral_extension";
 	    $message = "RingCentral extension cannot be blank.";
 	}
-	if ($rc_handshake["password"] == "") {
+	if ($form_data["password"] == "") {
 	    $print_again = true;
 	    $label = "ringcentral_password";
 	    $message = "RingCentral password cannot be blank.";
@@ -411,34 +380,24 @@ Function check_form() {
 	    $label = "recaptcha_secret";
 	    $message = "Google ReCaptcha Secret Key cannot be blank.";
 	}
-	/*
-	if ($_POST['oauth_client'] == "") {
-	    $print_again = true;
-	    $label = "oauth_client";
-	    $message = "OAuth Client Key cannot be blank.";
+
+    /*
+	if ($_POST['embedded_phone'] == "on" && $_POST['enable_glip'] == "on" ) {
+		$print_again = true;
+		$label = "embedded_phone";
+		$message = "Both embedded phone and team messaging cannot be activated at the same time.";
 	}
-	
-	if ($_POST['oauth_secret'] == "") {
-	    $print_again = true;
-	    $label = "oauth_secret";
-	    $message = "OAuth Secret Key cannot be blank.>";
-	} */
-	
-//	if ($_POST['embedded_phone'] == "on" && $_POST['enable_glip'] == "on" ) {
-//		$print_again = true;
-//		$label = "embedded_phone";
-//		$message = "Both embedded phone and team messaging cannot be activated at the same time.";
-//	}
-//	if ($_POST['embed_width'] <= 0 && $_POST['enable_glip'] == "on") {
-//		$print_again = true;
-//		$label = "embed_width";
-//		$message = "If you are activating embeded team messaging then the width setting cannot be blank and must be greater than 0";
-//	}
-//	if ($_POST['embed_height'] <= 0 && $_POST['enable_glip'] == "on") {
-//		$print_again = true;
-//		$label = "embed_height";
-//		$message = "If you are activating embeded team messaging then the height setting cannot be blank and must be greater than 0";
-//	}
+	if ($_POST['embed_width'] <= 0 && $_POST['enable_glip'] == "on") {
+		$print_again = true;
+		$label = "embed_width";
+		$message = "If you are activating embeded team messaging then the width setting cannot be blank and must be greater than 0";
+	}
+	if ($_POST['embed_height'] <= 0 && $_POST['enable_glip'] == "on") {
+		$print_again = true;
+		$label = "embed_height";
+		$message = "If you are activating embeded team messaging then the height setting cannot be blank and must be greater than 0";
+	}
+    */
 
 	// end data integrity checking
 
@@ -466,24 +425,21 @@ Function check_form() {
         	$enable_glip = 1;
         } else {
         	$enable_glip = 0;
-        }        
-		
-		$rc_handshake['password'] = ringcentral_encrypt($rc_handshake['password']);
+        }
+
+        $form_data['password'] = ringcentral_encrypt($form_data['password']);
         $token_prefix = sanitize_text_field($_POST['token_prefix']) ;
         $embed_width = sanitize_text_field($_POST['embed_width']) ;
         $embed_height = sanitize_text_field($_POST['embed_height']) ;
         
-//         $oauth_client = $_POST['oauth_client'] ;
-//         $oauth_secret = $_POST['oauth_secret'] ;
-
         $config_sql = $wpdb->prepare("UPDATE `ringcentral_control` SET `jwt_key` = %s, 
             `embedded_phone` = %d, `email_updates` = %d, `mobile_updates` = %d, `client_id` = %s, `client_secret` = %s,
             `ringcentral_user_name` = %s, `ringcentral_extension` = %d, `ringcentral_password` = %s, `ringcentral_sandbox` = %d,
         	`enable_glip` = %d, `embed_width` = %d,`embed_height` = %d,	
             `grc_site_key` = %s, `grc_secret_key` = %s, `token_prefix` = %s
-            WHERE `ringcentral_control_id` = %d", $rc_handshake['jwt_key'], $embedded_phone, $email_updates, $mobile_updates,
-            $rc_handshake['client_id'], $rc_handshake['client_secret'],
-            $rc_handshake['user_name'], $rc_handshake['extension'], $rc_handshake['password'], $sandbox,
+            WHERE `ringcentral_control_id` = %d", $form_data['jwt_key'], $embedded_phone, $email_updates, $mobile_updates,
+            $form_data['client_id'], $form_data['client_secret'],
+            $form_data['user_name'], $form_data['extension'], $form_data['password'], $sandbox,
         	$enable_glip, $embed_width, $embed_height,	 
             $GRCSite, $GRCSecret, $token_prefix, 1) ;
                 

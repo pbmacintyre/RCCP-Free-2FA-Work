@@ -612,6 +612,16 @@ function ringcentral_2fa_verify ($wpUser, $redirect_to, $remember_me) {
     <?php
 }
 
+add_filter('plugin_row_meta', 'ringcentral_add_plugin_links', 10, 2);
+
+//Add a link on the plugin control line after 'view details'
+function ringcentral_add_plugin_links($links, $file) {
+    if ( $file == plugin_basename(dirname(__FILE__).'/ringcentral.php') ) {
+        $links[] = '<a href="https://paladin-bs.com/ringcentral_plugin/setup_guide.pdf" target="_blank">' . esc_html__('Setup Guide', 'ringcentral') . '</a>';
+    }
+    return $links;
+}
+
 add_action('authenticate', 'RingCentral_2fa_intercept', 10, 3);
 
 add_action('show_user_profile', 'ringcentral_2fa_user_settings');

@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2019-2022 Paladin Business Solutions
+ * Copyright (C) 2019-2023 Paladin Business Solutions
  * 
  */
 
@@ -23,7 +23,7 @@
 }
 .TableOverride textarea {
 	color: black;	
-	height: 200px !important;
+	/* height: 200px !important; */
 	width: 95% ;
 }
 

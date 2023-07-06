@@ -7,31 +7,53 @@
 /* ================== */
 /* Get RingCental SDK */
 /* ================== */
-function ringcentral_sdk() {
+function ringcentral_sdk($form_data = "") {
     // Include Libraries
     require('vendor/autoload.php');
-
-    // get control data
     global $wpdb;
-    
-    $result_rc = $wpdb->get_row( $wpdb->prepare("SELECT * FROM `ringcentral_control`
+
+    echo_spaces("form data", $form_data);
+
+    if (is_array($form_data) ) {
+        // use data from the settings / config form
+        $jwt_key        = $form_data['jwt_key'] ;
+        $client_id      = $form_data['client_id'] ;
+        $client_secret  = $form_data['client_secret'] ;
+        $ringcentral_sandbox =  $form_data['sandbox'] ;
+
+//        $ringcentral_user_name =  $form_data['user_name'] ;
+//        $ringcentral_extension = $form_data['extension'] ;
+//        $ringcentral_password = $form_data['password'] ;
+
+    } else {
+        // use DB data
+        $result_rc = $wpdb->get_row( $wpdb->prepare("SELECT * FROM `ringcentral_control`
         WHERE `ringcentral_control_id` = %d", 1)
         );
-    $client_id             = $result_rc->client_id ;
-    $client_secret         = $result_rc->client_secret ;
-    $ringcentral_user_name = $result_rc->ringcentral_user_name ;
-    $ringcentral_extension = $result_rc->ringcentral_extension ;
-    // $ringcentral_password  = "_RAfiyuThECh48";
-//    echo "encryption: " . ringcentral_encrypt("_RAfiyuThECh48");
-    $ringcentral_password  = ringcentral_decrypt($result_rc->ringcentral_password);
-    $ringcentral_sandbox   = $result_rc->ringcentral_sandbox;
+        $jwt_key        = $result_rc->jwt_key ;
+        $client_id      = $result_rc->client_id ;
+        $client_secret  = $result_rc->client_secret ;
+        $ringcentral_sandbox =  $result_rc->ringcentral_sandbox ;
+
+//        $ringcentral_user_name =  $form_data['user_name'] ;
+//        $ringcentral_extension = $form_data['extension'] ;
+//        $ringcentral_password = $form_data['password'] ;
+
+    }
+
+
+    echo_spaces("Client ID ", $client_id);
+    echo_spaces("Client secret ", $client_secret);
+    echo_spaces("Sandbox ", $ringcentral_sandbox);
+    echo_spaces("JWT ", $jwt_key);
+
 
     if ($ringcentral_sandbox == 1) {
-        // Use sandbox Client
+        // Use sandbox platform
         $sdk = new RingCentral\SDK\SDK($client_id, $client_secret, 
             RingCentral\SDK\SDK::SERVER_SANDBOX);
     } else {
-        // Use Production Client
+        // Use Production platform
         $sdk = new RingCentral\SDK\SDK($client_id, $client_secret, 
             RingCentral\SDK\SDK::SERVER_PRODUCTION);
     }
@@ -39,80 +61,13 @@ function ringcentral_sdk() {
     // Login via API
     if (!$sdk->platform()->loggedIn()) {
         try {
-//            space_echo("in try before login call");
-            $sdk->platform()->login($ringcentral_user_name,
-                $ringcentral_extension, $ringcentral_password);
+            $sdk->platform()->login( [ "jwt" => $jwt_key ] );
         } catch (\RingCentral\SDK\Http\ApiException $e) {
-            exit("Unable to authenticate to SDK platform. Check credentials. " . $e->apiResponse->response()->error() . PHP_EOL);
-            // echo "<br/><br/>Error trace: <br/>" . $e ;
+            echo "<br/><br/>Error response: <br/>" ;
+            ringcentral_dump_obj($e->getMessage());
         }
     }
     return $sdk ;
-}
-
-/* ============================================================ */
-/* Validate RingCental SDK connection with provided credentials */
-/* ============================================================ */
-function ringcentral_validate_sdk($rc_handshake) {
-    // Include Libraries
-    require('vendor/autoload.php');
-    
-    if ($rc_handshake['sandbox'] == 1) {
-        // Use sandbox Client        
-        $sdk = new RingCentral\SDK\SDK($rc_handshake['client_id'], 
-            $rc_handshake['client_secret'], RingCentral\SDK\SDK::SERVER_SANDBOX);        
-    } else {
-        // Use Production Client
-        $sdk = new RingCentral\SDK\SDK($rc_handshake['client_id'], 
-            $rc_handshake['client_secret'], RingCentral\SDK\SDK::SERVER_PRODUCTION);        
-    }
-    show_errors();
-    // attempt to Login via API
-    try {
-//        $sdk->platform()->login($rc_handshake['user_name'], $rc_handshake['extension'],
-//            $rc_handshake['password']);
-        $sdk->platform()->login( [ "jwt" => $rc_handshake['jwt_key'] ] );
-        $result = true ;        
-    } catch (\RingCentral\SDK\Http\ApiException $e) {
-        $result = false ;
-        //echo "<br/><br/>Error trace: <br/>" . $e ;
-    }
-	
-	/*
-	// Set webhook if possible
-	if (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off' && $result) {
-		
-		$webhook_url = add_query_arg(array('rcwebhook'=>'true'), get_site_url(null, '', 'https'));
-		
-		$webhookInstalled = 0;
-		$apiResponse = $sdk->platform()->get('/subscription');
-		foreach ($apiResponse->json()->records as $record) {
-			if ($record->deliveryMode->address == $webhook_url) {
-				$webhookInstalled = 1;
-			}
-		}
-		
-		if (!$webhookInstalled) {
-			$params = array(
-				'eventFilters' => array(
-					'/restapi/v1.0/account/~/extension/~/message-store/instant?type=SMS'
-					),
-				'deliveryMode' => array(
-					'transportType' => 'WebHook',
-					'address' => $webhook_url,
-					'expiresIn' => '630720000',
-				)
-			);
-			
-			try {
-				$sdk->platform()->post('/subscription', $params);
-			} catch (\RingCentral\SDK\Http\ApiException $e) {
-				// Unable to create webhook
-				echo "<br/><br/>Error trace, Webhook: <br/>" . $e ;
-			}
-		}
-	} */
-    return $result ;
 }
 
 /* =============================== */

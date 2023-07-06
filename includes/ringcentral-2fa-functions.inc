@@ -137,10 +137,10 @@ function ringcentral_gen_six_digit_code ($user, $login = 1) {
     }
 
     // connect to SDK with credentials in the DB
+
     $sdk = ringcentral_sdk();
     $from = ringcentral_get_from_phone();
     $to = ringcentral_2fa_valid_mobile(get_user_meta($user->ID, 'RingCentral_2fa_user_mobile', true)) ;
-
 
     try {
         // echo "in try... <br/>";
@@ -153,7 +153,7 @@ function ringcentral_gen_six_digit_code ($user, $login = 1) {
     catch (\RingCentral\SDK\Http\ApiException $e) {
         // Getting error messages using PHP native interface
         $apiResponse = $e->apiResponse();
-        $message = '  Message: ' . $e->apiResponse->response()->error() . PHP_EOL;
+//        $message = '  Message: ' . $e->apiResponse->response()->error() . PHP_EOL;
         // craft a friendly message here.
         $return_message = "There was an error sending the validation code, Please try again later <br/>" . $message;
     }
