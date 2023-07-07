@@ -485,8 +485,8 @@ function RingCentral_2fa_intercept ($user, $username, $password) {
     }
 
     $redirect_to = isset($_POST['redirect_to']) ? sanitize_url($_POST['redirect_to']) : admin_url();
-    $session_token = isset($_SESSION['RingCentral_session_token']) ? sanitize_text_field($_SESSION['RingCentral_session_token']) : "";
-    $post_token = isset($_POST['ringcentral_post_token']) ? sanitize_text_field($_POST['ringcentral_post_token']) : false;
+//    $session_token = isset($_SESSION['RingCentral_session_token']) ? sanitize_text_field($_SESSION['RingCentral_session_token']) : "";
+//    $post_token = isset($_POST['ringcentral_post_token']) ? sanitize_text_field($_POST['ringcentral_post_token']) : false;
 
     // will be used in the verify function to see a user login cookie TTD
     $remember_me = isset($_POST['remember_me']) && $_POST['remember_me'] === 'forever';
@@ -621,6 +621,7 @@ function ringcentral_add_plugin_links($links, $file) {
     }
     return $links;
 }
+
 
 add_action('authenticate', 'RingCentral_2fa_intercept', 10, 3);
 

@@ -27,14 +27,10 @@ function ringcentral_2fa_form_settings_validation (&$errors, $update, &$user ) {
 
     if (!$enabled) {
         $current_enabled_state = get_the_author_meta('RingCentral_2fa_user_enabled', $user->ID);
-//        echo_spaces("current enabled state", $current_enabled_state);
-//        echo_spaces("enabled checkbox value", $enabled);
-//        echo_spaces("user access level", $selected_user_access_lvl);
 
         if ($current_enabled_state == 1 && $enabled == "" && $isUserAdmin) {
             $errors->add('RingCentral_2fa_settings_update_error',
                 'You have disabled the 2FA feature, you will have to re-validate your mobile number when this is reactivated');
-
         }
         // 2FA is off, so clean out the settings
         update_user_meta($user->ID, 'RingCentral_2fa_user_enabled', 0);
@@ -129,7 +125,8 @@ function ringcentral_gen_six_digit_code ($user, $login = 1) {
         // put in wp_usermeta if updating / adding a user profile to admin system
         update_user_meta($user->ID, 'RingCentral_2fa_user_2fa_code', $six_digit_code);
         update_user_meta($user->ID, 'RingCentral_2fa_fresh_code_sent', 1);
-        $message = "\nTo continue your login for '$website_name' use the following six-digit code. We will never call or email for this code: $six_digit_code";
+        $message = "\nYou or another person has requested to use this number for '$website_name' two-factor authentication. 
+        To enable 2FA please enter the following code on the admin user page: $six_digit_code";
     } else { // WP Admin login form is being used
         // make sure fresh code is 0
         update_user_meta($user->ID, 'RingCentral_2fa_fresh_code_sent', 0);

@@ -52,10 +52,9 @@ class ringcentral_contacts_widget extends WP_Widget {
 		<br/>
         <?php ringcentral_build_recaptcha_main(); ?>
         <br/>
-		<center>
 		<input type="submit" name="contact_submit" value="Join List" style="background: #008ec2; border-color: #006799; color: #fff;">
-		</center>
-        </form>
+        </form><br/>
+        By submitting this form I am agreeing to receive email and SMS notifications.
 <?php           
         // check that the form was submitted
         if(isset($_POST['contact_submit']) && $_POST['contact_submit'] == "Join List" ) {
@@ -144,7 +143,7 @@ class ringcentral_contacts_widget extends WP_Widget {
                         Check your email to confirm<br/>Thanks for joining us!</p></center>" ;                    
                 }
             }
-            // if only given an mobile, check to see if we already have it
+            // if we are only given a mobile, check to see if we already have it
             if ($email == "" && $mobile != "") {                
                 $result_rc = $wpdb->get_row( $wpdb->prepare("SELECT `ringcentral_contacts_id`
                     FROM `ringcentral_contacts`

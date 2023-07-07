@@ -188,7 +188,7 @@ Function show_form($message, $label = "", $color = "#008EC2") {
               if ($result_rc->ringcentral_user_name) {
                 echo $result_rc->ringcentral_user_name ;
               } else {
-                echo "&nbsp;" ;  
+                echo "" ;
               }
           }
             ?>"><br />
@@ -402,7 +402,7 @@ Function check_form() {
             `ringcentral_user_name` = %s, `ringcentral_sandbox` = %d, `enable_glip` = %d, `embed_width` = %d,`embed_height` = %d,	
             `grc_site_key` = %s, `grc_secret_key` = %s, `token_prefix` = %s
             WHERE `ringcentral_control_id` = %d", $form_data['jwt_key'], $embedded_phone, $email_updates, $mobile_updates,
-            $form_data['client_id'], $form_data['client_secret'], $form_data['user_name'], $sandbox,
+            $form_data['client_id'], $form_data['client_secret'], $_POST['ringcentral_user_name'], $sandbox,
         	$enable_glip, $embed_width, $embed_height,	 
             $GRCSite, $GRCSecret, $token_prefix, 1) ;
                 
