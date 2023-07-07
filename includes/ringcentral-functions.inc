@@ -12,8 +12,6 @@ function ringcentral_sdk($form_data = "") {
     require('vendor/autoload.php');
     global $wpdb;
 
-    echo_spaces("form data", $form_data);
-
     if (is_array($form_data) ) {
         // use data from the settings / config form
         $jwt_key        = $form_data['jwt_key'] ;
@@ -22,8 +20,6 @@ function ringcentral_sdk($form_data = "") {
         $ringcentral_sandbox =  $form_data['sandbox'] ;
 
 //        $ringcentral_user_name =  $form_data['user_name'] ;
-//        $ringcentral_extension = $form_data['extension'] ;
-//        $ringcentral_password = $form_data['password'] ;
 
     } else {
         // use DB data
@@ -36,17 +32,7 @@ function ringcentral_sdk($form_data = "") {
         $ringcentral_sandbox =  $result_rc->ringcentral_sandbox ;
 
 //        $ringcentral_user_name =  $form_data['user_name'] ;
-//        $ringcentral_extension = $form_data['extension'] ;
-//        $ringcentral_password = $form_data['password'] ;
-
     }
-
-
-    echo_spaces("Client ID ", $client_id);
-    echo_spaces("Client secret ", $client_secret);
-    echo_spaces("Sandbox ", $ringcentral_sandbox);
-    echo_spaces("JWT ", $jwt_key);
-
 
     if ($ringcentral_sandbox == 1) {
         // Use sandbox platform
@@ -63,8 +49,7 @@ function ringcentral_sdk($form_data = "") {
         try {
             $sdk->platform()->login( [ "jwt" => $jwt_key ] );
         } catch (\RingCentral\SDK\Http\ApiException $e) {
-            echo "<br/><br/>Error response: <br/>" ;
-            ringcentral_dump_obj($e->getMessage());
+            $sdk = false;
         }
     }
     return $sdk ;

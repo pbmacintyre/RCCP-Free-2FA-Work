@@ -122,8 +122,7 @@ Function show_form($message, $label = "", $color = "#008EC2") {
         <td class="left_col">
             <p style='display: inline;' >Reveal Tokens:</p>
         </td>
-        <td class="right_col">             
-          <!--  <button type="button" onmousedown="reveal_it();" >Toggle Passwords</button> -->     
+        <td class="right_col">
             <button type="button" onmouseout="hide_it();" onmousedown="reveal_it();" onmouseup="hide_it();">Reveal Tokens</button>
         </td>
     </tr>
@@ -198,35 +197,7 @@ Function show_form($message, $label = "", $color = "#008EC2") {
                 [<a href="https://support.ringcentral.com/sms-registration" target="_blank">Learn More</a>]</div>
 		
 		</td>
-	</tr>	
-	<tr class="TableOverride">
-		<td class="left_col">
-			<p style='display: inline; <?php if ($label == "ringcentral_extension") echo "color:red"; ?>' >RingCentral Extension:</p>
-			<p style='color: red; display: inline'>*</p>
-		</td>
-		<td class="right_col"><input type="text" name="ringcentral_extension" value="<?php 
-		  if ($print_again) {
-		      echo sanitize_text_field($_POST['ringcentral_extension']);
-          } else {             
-              if ($result_rc->ringcentral_extension) { echo $result_rc->ringcentral_extension ; } 
-          }
-            ?>"></td>
-	</tr>	
-	<tr class="TableOverride">
-		<td class="left_col">
-			<p style='display: inline; <?php if ($label == "ringcentral_password") echo "color:red"; ?>' >RingCentral Password:</p>
-			<p style='color: red; display: inline'>*</p>
-		</td>
-		<td class="right_col"><input type="password" name="ringcentral_password" id="myRCPassword" value="<?php 
-		  if ($print_again) {
-		      echo sanitize_text_field($_POST['ringcentral_password']);
-          } else {        
-              if ($result_rc->ringcentral_password) {
-                echo ringcentral_decrypt($result_rc->ringcentral_password) ;
-              } 
-          }
-            ?>"></td>
-	</tr>	
+	</tr>
 	<tr class="TableOverride">
 		<td class="left_col">
 			<p style='display: inline; <?php if ($label == "token_prefix") echo "color:red"; ?>' >Token Prefix:</p>
@@ -321,19 +292,13 @@ Function check_form() {
 	$form_data = array(
 	    "jwt_key"          => sanitize_text_field($_POST['jwt_key']),
 	    "client_id"        => sanitize_text_field($_POST['client_id']),
-	    //"client_id"        => '2F8P8KXOVj7fk8uKqeLHqX',
-//	    "client_secret"    => '9D0OrBJGOfkbiTVMIagkMnXm8LuWAdv3xfx64A8vjGQS',
 	    "client_secret"    => sanitize_text_field($_POST['client_secret']),
-	    "user_name"        => sanitize_text_field($_POST['ringcentral_user_name']) ,
-	    "extension"        => sanitize_text_field($_POST['ringcentral_extension']) ,
-	    "password"         => sanitize_text_field($_POST['ringcentral_password']) , 	    
 	    "sandbox"          => $sandbox 	    
 	);
-    echo_spaces("form data", $form_data);
 
 	$GRCSite   = $_POST["recaptcha_site"] ;
 	$GRCSecret = $_POST["recaptcha_secret"] ;
-	
+
 // 	/* data integrity checks */	
 	if (!ringcentral_sdk($form_data) ) {
 	    $print_again = true;
@@ -355,21 +320,21 @@ Function check_form() {
 	    $label = "client_secret";
 	    $message = "Client Secret Key cannot be blank.";
 	}
-	if ($form_data["user_name"] == "") {
+	if (sanitize_text_field($_POST['ringcentral_user_name']) == "") {
 	    $print_again = true;
 	    $label = "ringcentral_user_name";
 	    $message = "RingCentral User Name cannot be blank.";
 	}
-	if ($form_data["extension"] == "") {
-	    $print_again = true;
-	    $label = "ringcentral_extension";
-	    $message = "RingCentral extension cannot be blank.";
-	}
-	if ($form_data["password"] == "") {
-	    $print_again = true;
-	    $label = "ringcentral_password";
-	    $message = "RingCentral password cannot be blank.";
-	}	
+//	if ($form_data["extension"] == "") {
+//	    $print_again = true;
+//	    $label = "ringcentral_extension";
+//	    $message = "RingCentral extension cannot be blank.";
+//	}
+//	if ($form_data["password"] == "") {
+//	    $print_again = true;
+//	    $label = "ringcentral_password";
+//	    $message = "RingCentral password cannot be blank.";
+//	}
 	if ($GRCSite == "") {
 	    $print_again = true;
 	    $label = "recaptcha_site";
@@ -434,12 +399,10 @@ Function check_form() {
         
         $config_sql = $wpdb->prepare("UPDATE `ringcentral_control` SET `jwt_key` = %s, 
             `embedded_phone` = %d, `email_updates` = %d, `mobile_updates` = %d, `client_id` = %s, `client_secret` = %s,
-            `ringcentral_user_name` = %s, `ringcentral_extension` = %d, `ringcentral_password` = %s, `ringcentral_sandbox` = %d,
-        	`enable_glip` = %d, `embed_width` = %d,`embed_height` = %d,	
+            `ringcentral_user_name` = %s, `ringcentral_sandbox` = %d, `enable_glip` = %d, `embed_width` = %d,`embed_height` = %d,	
             `grc_site_key` = %s, `grc_secret_key` = %s, `token_prefix` = %s
             WHERE `ringcentral_control_id` = %d", $form_data['jwt_key'], $embedded_phone, $email_updates, $mobile_updates,
-            $form_data['client_id'], $form_data['client_secret'],
-            $form_data['user_name'], $form_data['extension'], $form_data['password'], $sandbox,
+            $form_data['client_id'], $form_data['client_secret'], $form_data['user_name'], $sandbox,
         	$enable_glip, $embed_width, $embed_height,	 
             $GRCSite, $GRCSecret, $token_prefix, 1) ;
                 
