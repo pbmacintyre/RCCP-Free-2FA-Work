@@ -34,8 +34,7 @@ class ringcentral_contacts_widget extends WP_Widget {
     
     // display the widget
     function widget ($args, $instance) {
-        global $wpdb ;
-        
+
         extract($args);
         echo $before_widget;
         $title = apply_filters ('widget_title', $instance['title']);        

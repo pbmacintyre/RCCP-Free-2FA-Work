@@ -18,9 +18,6 @@ function ringcentral_sdk($form_data = "") {
         $client_id      = $form_data['client_id'] ;
         $client_secret  = $form_data['client_secret'] ;
         $ringcentral_sandbox =  $form_data['sandbox'] ;
-
-//        $ringcentral_user_name =  $form_data['user_name'] ;
-
     } else {
         // use DB data
         $result_rc = $wpdb->get_row( $wpdb->prepare("SELECT * FROM `ringcentral_control`
@@ -30,8 +27,6 @@ function ringcentral_sdk($form_data = "") {
         $client_id      = $result_rc->client_id ;
         $client_secret  = $result_rc->client_secret ;
         $ringcentral_sandbox =  $result_rc->ringcentral_sandbox ;
-
-//        $ringcentral_user_name =  $form_data['user_name'] ;
     }
 
     if ($ringcentral_sandbox == 1) {
@@ -95,15 +90,9 @@ function ringcentral_send_welcome_mobile($to, $token, $full_name) {
                 'to'   => array( array('phoneNumber' => $to) ),
                 'text' => $message ) );
     } catch (\RingCentral\SDK\Http\ApiException $e) {
-        
-        // Getting error messages using PHP native interface
-        //                     print 'Expected HTTP Error: ' . $e->getMessage() . PHP_EOL;
-        
         // In order to get Request and Response used to perform transaction:
         $apiResponse = $e->apiResponse();
-        //                     print_r($apiResponse->request());
-        //                     print_r($apiResponse->response());
-        
+
         // Another way to get message, but keep in mind, that there could be no response if request has failed completely
         // print '  Message: ' . $e->apiResponse->response()->error() . PHP_EOL;
         $message = '  Message: ' . $e->apiResponse->response()->error() . PHP_EOL;
@@ -308,5 +297,8 @@ function post_tm_chat($rcsdk, $chatId, $team_chat) {
 	}
 	return $result;	 
 }
-
-?>
+function ringcentral_admin_page_top () { ?>
+    <img id='page_title_img' title="RingCentral Plugin" src="<?= RINGCENTRAL_LOGO; ?>">
+        &nbsp;&nbsp;
+        <h1 id='page_title'><?= esc_html(get_admin_page_title()); ?></h1>
+<?php } ?>

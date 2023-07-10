@@ -25,8 +25,6 @@ See License URI for full details.
 Copyright (C) 2019-2023 Paladin Business Solutions
 */
 
-error_reporting(E_ALL);
-ini_set('display_errors', 0);
 
 /* ============================== */
 /* Set RingCentral Constant values */
@@ -106,8 +104,7 @@ function ringcentral_menu () {
         'ringcentral_Admin',                        // Menu slug
         'ringcentral_config_page',                  // menu destination function call
         RINGCENTRAL_PLUGINURL . 'images/rc_logo_20_20.jpg', // menu icon path
-//         'dashicons-phone', // menu icon path from dashicons library
-        25                                       // menu position level 
+        25                                       // menu position level
     );
     add_submenu_page(
         'ringcentral_Admin',                   // parent slug
@@ -173,10 +170,8 @@ function ringcentral_config_page () {
     }
     ?>
     <div class="wrap">
-        <img id='page_title_img' title="RingCentral Plugin" src="<?= RINGCENTRAL_LOGO; ?>">
-        <h1 id='page_title'><?= esc_html(get_admin_page_title()); ?></h1>
-
-        <?php require_once(RINGCENTRAL_PLUGINDIR . "includes/ringcentral-config-page.inc"); ?>
+<?php   ringcentral_admin_page_top();
+        require_once(RINGCENTRAL_PLUGINDIR . "includes/ringcentral-config-page.inc"); ?>
 
     </div>
     <?php
@@ -190,10 +185,8 @@ function ringcentral_add_subscribers () {
     }
     ?>
     <div class="wrap">
-        <img id='page_title_img' title="RingCentral Plugin" src="<?= RINGCENTRAL_LOGO; ?>">
-        <h1 id='page_title'><?= esc_html(get_admin_page_title()); ?></h1>
-
-        <?php require_once(RINGCENTRAL_PLUGINDIR . "includes/ringcentral-add-subscribers.inc"); ?>
+<?php   ringcentral_admin_page_top();
+        require_once(RINGCENTRAL_PLUGINDIR . "includes/ringcentral-add-subscribers.inc"); ?>
 
     </div>
     <?php
@@ -207,10 +200,8 @@ function ringCentral_list_subscribers () {
     }
     ?>
     <div class="wrap">
-        <img id='page_title_img' title="RingCentral Plugin" src="<?= RINGCENTRAL_LOGO; ?>">
-        <h1 id='page_title'><?= esc_html(get_admin_page_title()); ?></h1>
-
-        <?php require_once(RINGCENTRAL_PLUGINDIR . "includes/ringcentral-list-subscribers.inc"); ?>
+<?php   ringcentral_admin_page_top();
+        require_once(RINGCENTRAL_PLUGINDIR . "includes/ringcentral-list-subscribers.inc"); ?>
 
     </div>
     <?php
@@ -224,10 +215,8 @@ function ringCentral_list_callme_requests () {
     }
     ?>
     <div class="wrap">
-        <img id='page_title_img' title="RingCentral Plugin" src="<?= RINGCENTRAL_LOGO; ?>">
-        <h1 id='page_title'><?= esc_html(get_admin_page_title()); ?></h1>
-
-        <?php require_once(RINGCENTRAL_PLUGINDIR . "includes/ringcentral-list-callme.inc"); ?>
+<?php   ringcentral_admin_page_top();
+        require_once(RINGCENTRAL_PLUGINDIR . "includes/ringcentral-list-callme.inc"); ?>
 
     </div>
     <?php
@@ -241,10 +230,8 @@ function ringcentral_glip_send () {
     }
     ?>
     <div class="wrap">
-        <img id='page_title_img' title="RingCentral Plugin" src="<?= RINGCENTRAL_LOGO; ?>">
-        <h1 id='page_title'><?= esc_html(get_admin_page_title()); ?></h1>
-
-        <?php require_once(RINGCENTRAL_PLUGINDIR . "includes/ringcentral-glip.inc"); ?>
+<?php   ringcentral_admin_page_top();
+        require_once(RINGCENTRAL_PLUGINDIR . "includes/ringcentral-glip.inc"); ?>
 
     </div>
     <?php
@@ -258,10 +245,8 @@ function ringcentral_glip_embed () {
     }
     ?>
     <div class="wrap">
-        <img id='page_title_img' title="RingCentral Plugin" src="<?= RINGCENTRAL_LOGO; ?>">
-        <h1 id='page_title'><?= esc_html(get_admin_page_title()); ?></h1>
-
-        <?php require_once(RINGCENTRAL_PLUGINDIR . "includes/ringcentral-glip-embed.inc"); ?>
+<?php   ringcentral_admin_page_top();
+        require_once(RINGCENTRAL_PLUGINDIR . "includes/ringcentral-glip-embed.inc"); ?>
 
     </div>
     <?php
@@ -478,32 +463,24 @@ function RingCentral_2fa_intercept ($user, $username, $password) {
     // put $wpUser into the session ?
     $_SESSION['wpUser'] = $wpUser;
     // check that the user is 2FA enabled in their user account data
-//    $TwoFA_on = get_user_meta($wpUser->ID, 'RingCentral_2fa_user_enabled', true);
     $mobile_validated = get_user_meta($wpUser->ID, 'RingCentral_2fa_user_mobile_validated', true);
     if (!$mobile_validated) {
         return;
     }
 
     $redirect_to = isset($_POST['redirect_to']) ? sanitize_url($_POST['redirect_to']) : admin_url();
-//    $session_token = isset($_SESSION['RingCentral_session_token']) ? sanitize_text_field($_SESSION['RingCentral_session_token']) : "";
-//    $post_token = isset($_POST['ringcentral_post_token']) ? sanitize_text_field($_POST['ringcentral_post_token']) : false;
 
     // will be used in the verify function to see a user login cookie TTD
     $remember_me = isset($_POST['remember_me']) && $_POST['remember_me'] === 'forever';
 
-//    // check the form token to ensure the same process is trying to login
-//    if ($post_token && $post_token === $session_token) {
-//        // not sure if this is worth it
-//    }
-
     if ($wpUser) {
-        ringcentral_2fa_verify($wpUser, $redirect_to, $remember_me);
+        ringcentral_admin_login_2fa_verify($wpUser, $redirect_to, $remember_me);
     }
 
     return $user;
 }
 
-function ringcentral_2fa_verify ($wpUser, $redirect_to, $remember_me) {
+function ringcentral_admin_login_2fa_verify ($wpUser, $redirect_to, $remember_me) {
     // the validation code form was submitted
     if (isset($_POST['RC_Validate_submit'])) {
         // 6 digit code was sent... and form was submitted with user response.
