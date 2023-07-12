@@ -367,8 +367,7 @@ function ringcentral_check_queue () {
             SET `ringcentral_queue_complete` = 1 WHERE `ringcentral_queue_id` = %d", $queueId));
 
         $result_rc = $wpdb->get_row($wpdb->prepare("SELECT `email_updates`, `mobile_updates`
-			FROM `ringcentral_control`
-			WHERE `ringcentral_control_id` = %d", 1)
+			FROM `ringcentral_control` WHERE `ringcentral_control_id` = %d", 1)
         );
 
         if ($result_rc->email_updates) {

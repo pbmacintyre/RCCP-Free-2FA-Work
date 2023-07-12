@@ -157,8 +157,44 @@ function ringcentral_gen_six_digit_code ($user, $login = 1) {
 
 }
 
-function ringcentral_2fa_edit_profile ($selected_user_obj) {
+function ringcentral_2fa_edit_profile ($selected_user_obj) { ?>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $("#TwoFAEnabledAdmin").click(function() {
+                if($("#TwoFAEnabledAdmin").is(":checked") ) {
+                    $('#send-code').css('display', 'inline');
+                    $("#send-code").show();
+                } else {
+                    $("#send-code").hide();
+                }
+            });
+            $('#RingCentralMobile').blur(function(e) {
+                $("#v-code").show();
+                if (validatePhone('RingCentralMobile')) {
+                    $('#v-code').html('Valid phone number format');
+                    $('#v-code').css('color', 'green');
+                }
+                else {
+                    $('#v-code').html('Invalid phone number format');
+                    $('#v-code').css('color', 'red');
+                    $("#send-code").hide();
+                }
+            });
+        });
+        function validatePhone(RingCentralMobile) {
+            var a = document.getElementById(RingCentralMobile).value;
+            var filter = /^(\+\d{1,2}\s?)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$/;
+            if (filter.test(a)) {
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
 
+    </script>
+    <?php
     $loggedin_user_obj = wp_get_current_user();
     $loggedin_user_id = $loggedin_user_obj->data->ID ;
 
@@ -184,7 +220,7 @@ function ringcentral_2fa_edit_profile ($selected_user_obj) {
 
     <br/>
     <?php if ($loggedin_user_id == $selected_user_id) { // editing your own profile ?>
-        <h3>SMS Two-Factor Authentication Settings </h3>
+        <h3 id="RC_2FA">SMS Two-Factor Authentication Settings </h3>
         <div style="margin-top: 5px; width: 45%; border: 1px solid #004F6D; padding: 5px; background: #DAF0F8;">
             When enabling 2FA you are agreeing to be sent a pin code via SMS which will be required to complete the
             login process.</div>
@@ -198,28 +234,37 @@ function ringcentral_2fa_edit_profile ($selected_user_obj) {
     <?php } ?>
 
     <table class='form-table'>
-        <tr>
-            <th><label for='RingCentral_2fa_user_enabled'>Turn on 2FA ?</label></th>
+        <tr >
+            <th>
+                <p id="TwoFAAnchor"></p>
+                <label for='RingCentral_2fa_user_enabled'>Turn on 2FA ?</label></th>
             <td>
-                <input id="TwoFAEnabled" type='checkbox' name='RingCentral_2fa_user_enabled' <?php echo $checkedString; ?> value='<?php echo $enabled; ?>' />
+                <?php if ($selected_user_access_lvl == "administrator") { ?>
+                    <input id="TwoFAEnabledAdmin" type='checkbox' name='RingCentral_2fa_user_enabled' <?php echo $checkedString; ?> value='<?php echo $enabled; ?>' />
+                <?php } else { ?>
+                    <input id="TwoFAEnabled" type='checkbox' name='RingCentral_2fa_user_enabled' <?php echo $checkedString; ?> value='<?php echo $enabled; ?>' />
+                <?php } ?>
             </td>
         </tr>
         <tr >
-            <th style="vertical-align: middle;"><label for='RingCentral_2fa_user_mobile' >Mobile Phone Number</label></th>
+            <th style="vertical-align: middle;"><label for='RingCentralMobile' >Mobile Phone Number</label></th>
             <td>
-                +1 <input type='text' name='RingCentral_2fa_user_mobile' id='RingCentral_2fa_user_mobile'
+                +1 <input type='text' name='RingCentral_2fa_user_mobile' id='RingCentralMobile'
                           value='<?php echo $mobileValue; ?>' />
-
+                <div style="display: none" id="send-code">
+                    <a href="https://rccp-free.paladin-bs.com/wp-admin/user-edit.php/?user_id=<?php echo $selected_user_id ?>/#TwoFAAnchor">Send 6 digit validation code</a>
+                </div>
                 <br />
                 <span class='description'>US and Canadian mobile numbers only. </span>
+                <p id="v-code" style="display: none"></p>
                 <?php
                 if ($selected_user_access_lvl == "administrator") {
-                if ($enabled && $validated) {
-                    echo "<p id='validatedText' style='color: red; '>Entered mobile number has been 2FA validated</p>";
-                }
-                if ($fresh_code) {
-                    echo "<p style='color: red; '>a 6 digit code has been sent, enter it below to validate your mobile number</p>";
-                };
+                    if ($enabled && $validated) {
+                        echo "<p id='validatedText' style='color: red; '>Entered mobile number has been 2FA validated</p>";
+                    }
+                    if ($fresh_code) {
+                        echo "<p id='code-sent' style='color: red; display: none; '>a 6 digit code has been sent, enter it below to validate your mobile number</p>";
+                    };
 
                 ?>
             </td>
