@@ -149,8 +149,7 @@ function ringcentral_gen_six_digit_code ($user, $login = 1) {
     }
     catch (\RingCentral\SDK\Http\ApiException $e) {
         // Getting error messages using PHP native interface
-        $apiResponse = $e->apiResponse();
-//        $message = '  Message: ' . $e->apiResponse->response()->error() . PHP_EOL;
+        // $message = "Unable to authenticate to platform. Check credentials. " . $e->message . PHP_EOL);
         // craft a friendly message here.
         $return_message = "There was an error sending the validation code, Please try again later <br/>" . $message;
     }

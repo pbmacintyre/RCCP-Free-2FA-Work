@@ -31,13 +31,17 @@ function ringcentral_sdk($form_data = "") {
 
     if ($ringcentral_sandbox == 1) {
         // Use sandbox platform
-        $sdk = new RingCentral\SDK\SDK($client_id, $client_secret, 
-            RingCentral\SDK\SDK::SERVER_SANDBOX);
+//        $sdk = new RingCentral\SDK\SDK($client_id, $client_secret,
+//            RingCentral\SDK\SDK::SERVER_SANDBOX);
+        $server = 'https://platform.devtest.ringcentral.com';
     } else {
         // Use Production platform
-        $sdk = new RingCentral\SDK\SDK($client_id, $client_secret, 
-            RingCentral\SDK\SDK::SERVER_PRODUCTION);
+//        $sdk = new RingCentral\SDK\SDK($client_id, $client_secret,
+//            RingCentral\SDK\SDK::SERVER_PRODUCTION);
+        $server = 'https://platform.ringcentral.com';
     }
+
+    $sdk = new RingCentral\SDK\SDK($client_id, $client_secret, $server);
 
     // Login via API
     if (!$sdk->platform()->loggedIn()) {
@@ -45,6 +49,7 @@ function ringcentral_sdk($form_data = "") {
             $sdk->platform()->login( [ "jwt" => $jwt_key ] );
         } catch (\RingCentral\SDK\Http\ApiException $e) {
             $sdk = false;
+            // exit("Unable to authenticate to platform. Check credentials. " . $e->message . PHP_EOL);
         }
     }
     return $sdk ;
