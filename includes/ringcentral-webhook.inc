@@ -1,4 +1,3 @@
-
 <?php
 /**
  * Copyright (C) 2019-2023 Paladin Business Solutions
@@ -10,12 +9,18 @@ if (isset($_SERVER['HTTP_VALIDATION_TOKEN'])) {
 }
 
 $incoming = file_get_contents("php://input");
-if (empty($incoming)) { http_response_code(200); echo json_encode(array('responseType'=>'error', 'responseDescription'=>'No data was provided')); exit(); }
+if (empty($incoming)) {
+    http_response_code(200);
+    echo json_encode(array('responseType'=>'error', 'responseDescription'=>'No data was provided'));
+    exit();
+}
 
 $incoming_data = json_decode($incoming);
 
 if (!$incoming_data) {
-	http_response_code(200); echo json_encode(array('responseType'=>'error', 'responseDescription'=>'Media type not supported.  Please use JSON.')); exit();
+	http_response_code(200);
+    echo json_encode(array('responseType'=>'error', 'responseDescription'=>'Media type not supported.  Please use JSON.'));
+    exit();
 }
 
 $in_from = $incoming_data->body->from->phoneNumber;
@@ -46,4 +51,6 @@ if (preg_match('/(STOP)|(END)|(CANCEL)|(UNSUBSCRIBE)|(QUIT)/i', $text)) {
                 'text' => $message ) );
 }
 
-http_response_code(200); echo json_encode(array('responseType'=>'success', 'responseDescription'=>'Action accepted.')); exit();
+http_response_code(200);
+echo json_encode(array('responseType'=>'success', 'responseDescription'=>'Action accepted.'));
+exit();

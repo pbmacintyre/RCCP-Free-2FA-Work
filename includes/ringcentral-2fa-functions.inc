@@ -140,7 +140,6 @@ function ringcentral_gen_six_digit_code ($user, $login = 1) {
     $to = ringcentral_2fa_valid_mobile(get_user_meta($user->ID, 'RingCentral_2fa_user_mobile', true)) ;
 
     try {
-        // echo "in try... <br/>";
         $apiResponse = $sdk->platform()->post('/account/~/extension/~/sms',
             array('from' => array('phoneNumber' => $from),
                 'to' => array(array('phoneNumber' => $to)),

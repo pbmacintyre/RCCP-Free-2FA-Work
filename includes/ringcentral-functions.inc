@@ -31,13 +31,9 @@ function ringcentral_sdk($form_data = "") {
 
     if ($ringcentral_sandbox == 1) {
         // Use sandbox platform
-//        $sdk = new RingCentral\SDK\SDK($client_id, $client_secret,
-//            RingCentral\SDK\SDK::SERVER_SANDBOX);
         $server = 'https://platform.devtest.ringcentral.com';
     } else {
         // Use Production platform
-//        $sdk = new RingCentral\SDK\SDK($client_id, $client_secret,
-//            RingCentral\SDK\SDK::SERVER_PRODUCTION);
         $server = 'https://platform.ringcentral.com';
     }
 
@@ -123,6 +119,7 @@ function ringcentral_unique_token() {
 /* ======================================== */
 function ringcentral_get_from_phone() {
     global $wpdb;
+    // `ringcentral_user_name` is the phone number for the app owner
     $result_rc = $wpdb->get_row( $wpdb->prepare("SELECT `ringcentral_user_name`
             FROM `ringcentral_control` WHERE `ringcentral_control_id` = %d", 1 )
         );
