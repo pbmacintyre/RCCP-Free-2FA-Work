@@ -7,10 +7,10 @@
 /* ========= */
 /* show_form */
 /* ========= */
-Function show_form($message, $label = "", $color = "#008EC2") {	
-	
-	global $print_again, $wpdb;    	
-	
+Function show_form($message, $label = "", $color = "#008EC2") {
+
+	global $print_again, $wpdb;
+
 	if (ringcentral_CheckPro()) { ?>
         <form action="<?php echo RINGCENTRAL_PRO_URL ?>" target="_blank" style="padding-left: 15%;">
             <?php 
@@ -279,7 +279,8 @@ Function show_form($message, $label = "", $color = "#008EC2") {
 Function check_form() {
 	
 	global $print_again, $wpdb;
-	
+    show_errors();
+
 	$label = "" ;
 	$message = "" ;
 	
@@ -303,7 +304,7 @@ Function check_form() {
 	if (!ringcentral_sdk($form_data) ) {
 	    $print_again = true;
 	    $label = "";
-	    $message = "There was an error validating your Ring Central account credentials, please verify and try again";
+	    $message = "There was an error validating your RingCentral account credentials, please verify and try again";
 	}
     if ($form_data["jwt_key"] == "") {
         $print_again = true;
@@ -392,10 +393,15 @@ Function check_form() {
         	$enable_glip = 0;
         }
 
+        echo_spaces ("just before save.");
+
         $form_data['password'] = ringcentral_encrypt($form_data['password']);
         $token_prefix = sanitize_text_field($_POST['token_prefix']) ;
         $embed_width = sanitize_text_field($_POST['embed_width']) ;
         $embed_height = sanitize_text_field($_POST['embed_height']) ;
+
+        // pick up existing record before any changes are committed.
+        $result_rc = $wpdb->get_row( $wpdb->prepare("SELECT * FROM `ringcentral_control` WHERE `ringcentral_control_id` = %d", 1) );
         
         $config_sql = $wpdb->prepare("UPDATE `ringcentral_control` SET `jwt_key` = %s, 
             `embedded_phone` = %d, `email_updates` = %d, `mobile_updates` = %d, `client_id` = %s, `client_secret` = %s,
@@ -405,8 +411,44 @@ Function check_form() {
             $form_data['client_id'], $form_data['client_secret'], $_POST['ringcentral_user_name'], $sandbox,
         	$enable_glip, $embed_width, $embed_height,	 
             $GRCSite, $GRCSecret, $token_prefix, 1) ;
-                
-        $wpdb->query( $config_sql ); 
+
+        if($form_data['jwt_key'] != $result_rc->jwt_key || $sandbox != $result_rc->ringcentral_sandbox) {
+            if(!empty($result_rc->webhook_token)) {
+                // Make call to delete webhook
+                // DELETE https://platform.devtest.ringcentral.com/restapi/v1.0/subscription/{$result_rc->webhook_id}
+                $sdk = ringcentral_sdk() ;
+                $sdk->platform()->delete("/subscription/{$result_rc->webhook_token}");
+            }
+        }
+        // save any updated information to the database
+        $wpdb->query( $config_sql );
+
+        // now re-create the webhook token for the new credentials
+        if($form_data['jwt_key'] != $result_rc->jwt_key || $sandbox != $result_rc->ringcentral_sandbox) {
+
+            // Create subscription
+            // POST https://platform.devtest.ringcentral.com/restapi/v1.0/subscription
+
+            // SDK should now be using any new credentials just saved to DB
+            $sdk = ringcentral_sdk() ;
+            $api_call = $sdk->platform()->post('/subscription',
+                array(
+                    "eventFilters" => array(
+                        "/restapi/v1.0/account/~/extension/~/message-store/instant?type=SMS",
+                    ),
+                    "expiresIn" => "315360000",
+                    "deliveryMode" => array(
+                        "transportType" => "WebHook",
+                        "address" => get_site_url(null, null, "https").'?rcwebhook=1'
+                    )
+                )
+            );
+
+            // Save webhook ID in database
+            $webhook_sql = $wpdb->prepare("UPDATE `ringcentral_control` SET `webhook_token` = %s 
+            WHERE `ringcentral_control_id` = %d", $api_call->json()->id, 1) ;
+            $wpdb->query( $webhook_sql );
+        }
         
 	    $color = "#53DF00";
 	    $message = "Configuration Changes have been saved";	   
