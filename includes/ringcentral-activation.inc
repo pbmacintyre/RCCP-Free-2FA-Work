@@ -15,6 +15,7 @@ $ringcentral_sql = "CREATE TABLE `ringcentral_control` (
   `ringcentral_control_id` int(11) NOT NULL AUTO_INCREMENT,
   `embedded_phone` tinyint(4) NOT NULL,
   `jwt_key` text NOT NULL,
+  `webhook_token` VARCHAR(100) NULL, 
   `client_id` varchar(50) NOT NULL,
   `client_secret` varchar(50) NOT NULL,
   `ringcentral_user_name` varchar(50) NOT NULL,
