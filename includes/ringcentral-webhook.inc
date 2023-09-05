@@ -4,9 +4,9 @@
  *
  */
 
-$v = isset($_SERVER['HTTP_VALIDATION_TOKEN']) ? $_SERVER['HTTP_VALIDATION_TOKEN'] : '';
-if (strlen($v) > 0) {
-    header("Validation-Token: {$v}");
+$hvt = isset($_SERVER['HTTP_VALIDATION_TOKEN']) ? $_SERVER['HTTP_VALIDATION_TOKEN'] : '';
+if (strlen($hvt) > 0) {
+    header("Validation-Token: {$hvt}");
 }
 
 $incoming = file_get_contents("php://input");

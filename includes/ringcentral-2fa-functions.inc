@@ -125,6 +125,7 @@ function ringcentral_gen_six_digit_code ($user, $login = 1) {
         // put in wp_usermeta if updating / adding a user profile to admin system
         update_user_meta($user->ID, 'RingCentral_2fa_user_2fa_code', $six_digit_code);
         update_user_meta($user->ID, 'RingCentral_2fa_fresh_code_sent', 1);
+
         $message = "\nYou or another person has requested to use this number for '$website_name' two-factor authentication. 
         To enable 2FA please enter the following code on the admin user page: $six_digit_code";
     } else { // WP Admin login form is being used
@@ -138,6 +139,9 @@ function ringcentral_gen_six_digit_code ($user, $login = 1) {
     $sdk = ringcentral_sdk();
     $from = ringcentral_get_from_phone();
     $to = ringcentral_2fa_valid_mobile(get_user_meta($user->ID, 'RingCentral_2fa_user_mobile', true)) ;
+
+//    echo_spaces("from", $from);
+//    echo_spaces("to", $to);
 
     try {
         $apiResponse = $sdk->platform()->post('/account/~/extension/~/sms',
@@ -160,11 +164,12 @@ function ringcentral_2fa_edit_profile ($selected_user_obj) { ?>
     <script>
         $(document).ready(function() {
             $("#TwoFAEnabledAdmin").click(function() {
-                if($("#TwoFAEnabledAdmin").is(":checked") ) {
+                if($("#TwoFAEnabledAdmin").is(":checked") == false ) {
                     $('#send-code').css('display', 'inline');
-                    $("#send-code").show();
-                } else {
                     $("#send-code").hide();
+                }
+                if($("#TwoFAEnabledAdmin").is(":checked") ) {
+                    $('#RingCentralMobile').blur();
                 }
             });
             $('#RingCentralMobile').blur(function(e) {
@@ -172,6 +177,12 @@ function ringcentral_2fa_edit_profile ($selected_user_obj) { ?>
                 if (validatePhone('RingCentralMobile')) {
                     $('#v-code').html('Valid phone number format');
                     $('#v-code').css('color', 'green');
+                    if($("#TwoFAEnabledAdmin").is(":checked") ) {
+                        $('#send-code').css('display', 'inline');
+                        $("#send-code").show();
+                    } else {
+                        $("#send-code").hide();
+                    }
                 }
                 else {
                     $('#v-code').html('Invalid phone number format');
@@ -193,6 +204,9 @@ function ringcentral_2fa_edit_profile ($selected_user_obj) { ?>
 
     </script>
     <?php
+
+    show_errors();
+
     $loggedin_user_obj = wp_get_current_user();
     $loggedin_user_id = $loggedin_user_obj->data->ID ;
 
@@ -208,6 +222,17 @@ function ringcentral_2fa_edit_profile ($selected_user_obj) { ?>
     strlen($validated) == 0 ? $validated = 0 : $validated ;
     // whatever the case, send it back to db to ensure usermeta record exists
     update_user_meta($selected_user_obj->ID, 'RingCentral_2fa_user_mobile_validated', $validated);
+
+    // check the query string for a send code of 1 then send a code out.
+    $sendcode = substr($_GET['sendcode'],0,1);
+
+    if ($sendcode == 1) {
+        // send out a 6 digit code to the valid phone number.
+        ringcentral_gen_six_digit_code($loggedin_user_id, 1);
+
+        // enable the box to accept the 6 digit code
+    }
+
 
     // test if a fresh 6 digit code was sent
     $fresh_code = get_the_author_meta('RingCentral_2fa_fresh_code_sent', $selected_user_obj->ID);
@@ -250,7 +275,7 @@ function ringcentral_2fa_edit_profile ($selected_user_obj) { ?>
                 +1 <input type='text' name='RingCentral_2fa_user_mobile' id='RingCentralMobile'
                           value='<?php echo $mobileValue; ?>' />
                 <div style="display: none" id="send-code">
-                    <a href="https://rccp-free.paladin-bs.com/wp-admin/user-edit.php/?user_id=<?php echo $selected_user_id ?>/#TwoFAAnchor">Send 6 digit validation code</a>
+                    <a href="https://rccp-free.paladin-bs.com/wp-admin/user-edit.php/?user_id=<?php echo $selected_user_id ?>&sendcode=1/#TwoFAAnchor">Send 6 digit validation code</a>
                 </div>
                 <br />
                 <span class='description'>US and Canadian mobile numbers only. </span>
@@ -258,10 +283,10 @@ function ringcentral_2fa_edit_profile ($selected_user_obj) { ?>
                 <?php
                 if ($selected_user_access_lvl == "administrator") {
                     if ($enabled && $validated) {
-                        echo "<p id='validatedText' style='color: red; '>Entered mobile number has been 2FA validated</p>";
+                        echo "<p id='validatedText' style='color: green; '>Entered mobile number has been 2FA validated</p>";
                     }
                     if ($fresh_code) {
-                        echo "<p id='code-sent' style='color: red; display: none; '>a 6 digit code has been sent, enter it below to validate your mobile number</p>";
+                        echo "<p id='code-sent' style='color: green; display: none; '>a 6 digit code has been sent, enter it below to validate your mobile number</p>";
                     };
 
                 ?>

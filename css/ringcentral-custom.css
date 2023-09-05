@@ -29,10 +29,12 @@
 
 .left_col {
 	width: 35% !important ;
-	/* background-color: red !important ; */ 
+	vertical-align: top;
+    /* background-color: red !important ; */
 }
 .right_col {
-	width: 65% !important ;	  
+	width: 65% !important ;
+	vertical-align: top;
 }
 #page_title_img {	
 	vertical-align: middle;	

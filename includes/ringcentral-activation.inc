@@ -16,11 +16,8 @@ $ringcentral_sql = "CREATE TABLE `ringcentral_control` (
   `embedded_phone` tinyint(4) NOT NULL,
   `jwt_key` text NOT NULL,
   `webhook_token` VARCHAR(100) NULL, 
-  `client_id` varchar(50) NOT NULL,
-  `client_secret` varchar(50) NOT NULL,
-  `ringcentral_user_name` varchar(50) NOT NULL,
-  `ringcentral_extension` tinyint(4) NOT NULL,
-  `ringcentral_password` varchar(50) NOT NULL,
+  `client_id` varchar(50) NOT NULL,  
+  `ringcentral_user_name` varchar(50) NOT NULL,  
   `ringcentral_sandbox` TINYINT NOT NULL,
   `embed_width` SMALLINT(4) NOT NULL,
   `embed_height` SMALLINT(4) NOT NULL,		
@@ -46,10 +43,9 @@ if (!$row_exists) {
         array(
             'ringcentral_control_id' => 1,
             'embedded_phone' => 0,
-            'ringcentral_sandbox' => 1,            
-//            'embed_width' => 300,
-//            'embed_height' => 600,
-            'email_updates' => 1,            
+            'client_id' => '2F8P8KXOVj7fk8uKqeLHqX',
+            'ringcentral_sandbox' => 1,
+            'email_updates' => 1,
             'mobile_updates' => 0,            
             )
         );
@@ -119,7 +115,7 @@ if (!$row_exists) {
     $wpdb->query( $wpdb->prepare("INSERT INTO `ringcentral_help`
       (`ringcentral_help_id`, `ringcentral_help_field`, `ringcentral_help_help`)
       VALUES (%d, %s, %s)",
-        2, "token_prefix", "Your installations unique prefix to a link token that will be added to the opt-in email and SMS confirmation URLs" ) );
+        2, "token_prefix", "Your installations unique prefix to a link token that will be added to the opt-in email URLs" ) );
     $wpdb->query( $wpdb->prepare("INSERT INTO `ringcentral_help`
       (`ringcentral_help_id`, `ringcentral_help_field`, `ringcentral_help_help`)
       VALUES (%d, %s, %s)",
@@ -128,19 +124,6 @@ if (!$row_exists) {
       (`ringcentral_help_id`, `ringcentral_help_field`, `ringcentral_help_help`)
       VALUES (%d, %s, %s)",
     	4, "embedded_phone", "Use this checkbox to turn on the Embedded Phone tool, note it cannot be on at the same time as embedded Team Messaging" ) );
-    $wpdb->query( $wpdb->prepare("INSERT INTO `ringcentral_help`
-      (`ringcentral_help_id`, `ringcentral_help_field`, `ringcentral_help_help`)
-      VALUES (%d, %s, %s)",
-    	5, "enable_glip", "Use this checkbox to turn on embedded Team Messaging, note it cannot be on at the same time as the Embedded Phone" ) );
-    $wpdb->query( $wpdb->prepare("INSERT INTO `ringcentral_help`
-      (`ringcentral_help_id`, `ringcentral_help_field`, `ringcentral_help_help`)
-      VALUES (%d, %s, %s)",
-    	6, "embed_width", "Set the width in pixels for embedded Team Messaging; this should be a number greater than 300" ) );
-    $wpdb->query( $wpdb->prepare("INSERT INTO `ringcentral_help`
-      (`ringcentral_help_id`, `ringcentral_help_field`, `ringcentral_help_help`)
-      VALUES (%d, %s, %s)",
-   		7, "embed_height", "Set the height in pixels for embedded Team Messaging; this should be a number greater than 500" ) );
-    
 }
 /* ======================================= */
 /* build email confirmation page if needed */
@@ -168,46 +151,6 @@ if(!isset($page_check->ID)){
 /* =================================================== */
 $new_page_title = 'eMail Unsubscribe';
 $new_page_content = 'You have been unsubscribed from the email list ... Sorry to see you go.';
-$new_page_template = '';
-$page_check = get_page_by_title($new_page_title);
-$new_page = array(
-    'post_type' => 'page',
-    'post_title' => $new_page_title,
-    'post_content' => $new_page_content,
-    'post_status' => 'publish',
-    'post_author' => 1,
-);
-if(!isset($page_check->ID)){
-    $new_page_id = wp_insert_post($new_page);
-    if(!empty($new_page_template)){
-        update_post_meta($new_page_id, '_wp_page_template', $new_page_template);
-    }
-}
-/* ======================================== */
-/* build mobile confirmation page if needed */
-/* ======================================== */
-$new_page_title = 'Mobile Confirmation';
-$new_page_content = 'Your mobile device has been confirmed ... thanks for that !';
-$new_page_template = '';
-$page_check = get_page_by_title($new_page_title);
-$new_page = array(
-    'post_type' => 'page',
-    'post_title' => $new_page_title,
-    'post_content' => $new_page_content,
-    'post_status' => 'publish',
-    'post_author' => 1,
-);
-if(!isset($page_check->ID)){
-    $new_page_id = wp_insert_post($new_page);
-    if(!empty($new_page_template)){
-        update_post_meta($new_page_id, '_wp_page_template', $new_page_template);
-    }
-}
-/* ==================================================== */
-/* build mobile unsubscribe confirmation page if needed */
-/* ==================================================== */
-$new_page_title = 'Mobile Unsubscribe';
-$new_page_content = 'You have been unsubscribed from the mobile list ... Sorry to see you go.';
 $new_page_template = '';
 $page_check = get_page_by_title($new_page_title);
 $new_page = array(
