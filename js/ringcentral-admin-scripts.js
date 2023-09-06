@@ -1,7 +1,7 @@
 /**
  * Copyright (C) 2021 - 2023 Paladin Business Solutions
  *
- */ 
+ */
 
 function reveal_it() {
 	var y = document.getElementById("myGRCSite");    
@@ -26,3 +26,4 @@ function hide_it() {
 	  z.type = "password";
 	}
 }
+

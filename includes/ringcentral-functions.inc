@@ -25,7 +25,6 @@ function ringcentral_sdk($form_data = "") {
         );
         $jwt_key        = $result_rc->jwt_key ;
         $client_id      = $result_rc->client_id ;
-        $client_secret  = $result_rc->client_secret ;
         $ringcentral_sandbox =  $result_rc->ringcentral_sandbox ;
     }
 

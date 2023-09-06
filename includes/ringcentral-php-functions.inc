@@ -20,7 +20,8 @@ function ringcentral_dump_obj($object) {
     var_dump($object);
     echo "</pre>";
 }
-function echo_spaces($text, $value="", $count = 50) {
+function echo_spaces($text, $value="") {
+    $count = 50;
     for ($i = 1; $i <= $count; $i++) echo "&nbsp;" ;
     echo "<br /><strong><p style='color: red; display: inline'>$text:</p></strong> " ;
     if (is_string($value))  { echo $value; }

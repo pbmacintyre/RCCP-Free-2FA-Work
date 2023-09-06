@@ -388,6 +388,7 @@ function ringcentral_vars ($vars) {
     $vars[] = 'rcunsubscribe';
     $vars[] = 'rcformat';
     $vars[] = 'rcwebhook';
+    $vars[] = 'confirmmfa';
     return $vars;
 }
 
@@ -408,6 +409,9 @@ function ringcentral_handle_vars () {
     } elseif (!empty(get_query_var('rcwebhook'))) {
         // Check for opt out keywords
         require_once(RINGCENTRAL_PLUGINDIR . "includes/ringcentral-webhook.inc");
+    } elseif (!empty(get_query_var('confirmmfa'))) {
+        // Check sending 6 digit code for admin users
+        require_once(RINGCENTRAL_PLUGINDIR . "includes/ringcentral-confirmmfa.inc");
     }
 }
 
