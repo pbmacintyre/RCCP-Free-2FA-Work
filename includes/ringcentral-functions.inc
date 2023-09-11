@@ -75,12 +75,9 @@ function ringcentral_send_welcome_email($email, $token, $full_name) {
 /* send out welcome SMS function */
 /* ============================= */
 function ringcentral_send_welcome_mobile($to, $token, $full_name) {
-	$confirm_url = add_query_arg(array('rcsubscribe'=>$token, 'rcformat'=>'2'), get_site_url());
-	
     $message = "Hi $full_name: Thanks for joining our newsletter sign up process. [If this was not you please ignore this message]\n\n";
     $message .= "If you also signed up for email notifications you will receive a separate confirmation email in that regard.\n\n";
-    $message .= "Please follow this link to confirm your SMS subscription to our mailing list: \n\n ";
-    $message .= "$confirm_url ";
+    $message .= "Please reply by text with 'START' to confirm your SMS subscription to our mailing list: ";
     
     $from = ringcentral_get_from_phone();
     
