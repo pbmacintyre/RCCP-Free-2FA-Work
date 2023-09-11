@@ -409,9 +409,6 @@ function ringcentral_handle_vars () {
     } elseif (!empty(get_query_var('rcwebhook'))) {
         // Check for opt out keywords
         require_once(RINGCENTRAL_PLUGINDIR . "includes/ringcentral-webhook.inc");
-    } elseif (!empty(get_query_var('confirmmfa'))) {
-        // Check sending 6 digit code for admin users
-        require_once(RINGCENTRAL_PLUGINDIR . "includes/ringcentral-confirmmfa.inc");
     }
 }
 
@@ -498,7 +495,7 @@ function ringcentral_admin_login_2fa_verify ($wpUser, $redirect_to, $remember_me
         }
     } else {
         // this is the first time the form is being displayed (later in this function)
-        ringcentral_gen_six_digit_code($wpUser);
+        ringcentral_gen_six_digit_code($wpUser->ID);
     }
     ?>
     <style>

@@ -15,8 +15,7 @@ $ringcentral_sql = "CREATE TABLE `ringcentral_control` (
   `ringcentral_control_id` int(11) NOT NULL AUTO_INCREMENT,
   `embedded_phone` tinyint(4) NOT NULL,
   `jwt_key` text NOT NULL,
-  `webhook_token` VARCHAR(100) NULL, 
-  `client_id` varchar(50) NOT NULL,  
+  `webhook_token` VARCHAR(100) NULL,  
   `ringcentral_user_name` varchar(50) NOT NULL,  
   `ringcentral_sandbox` TINYINT NOT NULL,
   `embed_width` SMALLINT(4) NOT NULL,
@@ -43,8 +42,7 @@ if (!$row_exists) {
         array(
             'ringcentral_control_id' => 1,
             'embedded_phone' => 0,
-            'client_id' => '2F8P8KXOVj7fk8uKqeLHqX',
-            'ringcentral_sandbox' => 1,
+            'ringcentral_sandbox' => 0,
             'email_updates' => 1,
             'mobile_updates' => 0,            
             )
@@ -119,11 +117,11 @@ if (!$row_exists) {
     $wpdb->query( $wpdb->prepare("INSERT INTO `ringcentral_help`
       (`ringcentral_help_id`, `ringcentral_help_field`, `ringcentral_help_help`)
       VALUES (%d, %s, %s)",
-        3, "ringcentral_sandbox", "Turn this checkbox ON if you want to use the Ring Central SANDBOX SDK, leave it off for Production use." ) );
+        3, "ringcentral_sandbox", "Turn this checkbox ON if you want to use the RingCentral SANDBOX Environment, leave it off for Production use." ) );
     $wpdb->query( $wpdb->prepare("INSERT INTO `ringcentral_help`
       (`ringcentral_help_id`, `ringcentral_help_field`, `ringcentral_help_help`)
       VALUES (%d, %s, %s)",
-    	4, "embedded_phone", "Use this checkbox to turn on the Embedded Phone tool, note it cannot be on at the same time as embedded Team Messaging" ) );
+    	4, "embedded_phone", "Use this checkbox to turn on the Embedded Phone tool." ) );
 }
 /* ======================================= */
 /* build email confirmation page if needed */

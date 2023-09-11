@@ -26,6 +26,6 @@ function echo_spaces($text, $value="") {
     echo "<br /><strong><p style='color: red; display: inline'>$text:</p></strong> " ;
     if (is_string($value))  { echo $value; }
     if (is_object($value) || is_array($value)) { ringcentral_dump_obj($value); }
-    echo "<br />" ;
+    echo "<br /><br />" ;
 }
 ?>

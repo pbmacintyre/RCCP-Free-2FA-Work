@@ -95,7 +95,7 @@ Function show_form($message, $label = "", $color = "#008EC2") {
     
     <tr class="TableOverride">
         <td class="left_col">
-            <p style='display: inline; <?php if ($label == "ringcentral_sandbox") echo "color:red"; ?>' >Use the RingCentral SANDBOX SDK?</p>  
+            <p style='display: inline; <?php if ($label == "ringcentral_sandbox") echo "color:red"; ?>' >Use the RingCentral SANDBOX Environment?</p>
             
             <?php echo ringcentral_build_help("ringcentral_sandbox") ; ?>
                       

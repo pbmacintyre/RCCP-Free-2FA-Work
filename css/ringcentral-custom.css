@@ -7,7 +7,7 @@
 .TableOverride {
     background-color: white !important ;  	
 	margin-top: 10px;	
-	width: 800px ;	
+	width: 850px ;
 	/* border: 1px solid red ; */     
 }
 .TableOverride td, th {
@@ -43,33 +43,4 @@
 	display: inline;
 	vertical-align: middle;	
 }
-/* ==================================== */
-.GlipTable {
-    background-color: white !important ;    
-    margin-top: 10px;   
-    width: 800px ;  
-	padding-top:25px;
-	padding-bottom:25px;
-    /* border: 1px solid red ; */     
-}
-.GlipTable td, th {
-    padding: 5px !important ;         
-}
-.GlipTable select {
-    /* height: 26px !important;   */
-}
-.GlipTable input[type="text"], input[type="password"] { 
-    color: black;
-    width: 95% ;
-}
-.GlipTable textarea {
-    color: black;   
-    height: 200px !important;
-    width: 95% ;
-}
-.Glip_left_col {
-    width: 15% !important ;     
-}
-.Glip_right_col {
-    width: 75% !important ;   
-}
+

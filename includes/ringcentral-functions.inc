@@ -7,33 +7,34 @@
 /* ================== */
 /* Get RingCental SDK */
 /* ================== */
-function ringcentral_sdk($form_data = "") {
+function ringcentral_sdk($settings_data = "") {
     // Include Libraries
     require('vendor/autoload.php');
     global $wpdb;
 
-    if (is_array($form_data) ) {
+    if (is_array($settings_data) ) {
         // use data from the settings / config form
-        $jwt_key        = $form_data['jwt_key'] ;
-        $client_id      = $form_data['client_id'] ;
-        $client_secret  = $form_data['client_secret'] ;
-        $ringcentral_sandbox =  $form_data['sandbox'] ;
+        $jwt_key        = $settings_data['jwt_key'] ;
+        $ringcentral_sandbox =  $settings_data['sandbox'] ;
     } else {
         // use DB data
         $result_rc = $wpdb->get_row( $wpdb->prepare("SELECT * FROM `ringcentral_control`
         WHERE `ringcentral_control_id` = %d", 1)
         );
         $jwt_key        = $result_rc->jwt_key ;
-        $client_id      = $result_rc->client_id ;
         $ringcentral_sandbox =  $result_rc->ringcentral_sandbox ;
     }
 
     if ($ringcentral_sandbox == 1) {
         // Use sandbox platform
         $server = 'https://platform.devtest.ringcentral.com';
+        $client_id      = "2F8P8KXOVj7fk8uKqeLHqX" ;
+        $client_secret  = "9D0OrBJGOfkbiTVMIagkMnXm8LuWAdv3xfx64A8vjGQS" ;
     } else {
         // Use Production platform
         $server = 'https://platform.ringcentral.com';
+        $client_id      = "1wCjgWSFtUucSBkvWsHuhe";
+        $client_secret  = "0IAEWaEmVn0c57aeOSZdDpd49WLl7U9bBe1OQaobcupG" ;
     }
 
     $sdk = new RingCentral\SDK\SDK($client_id, $client_secret, $server);
@@ -43,8 +44,9 @@ function ringcentral_sdk($form_data = "") {
         try {
             $sdk->platform()->login( [ "jwt" => $jwt_key ] );
         } catch (\RingCentral\SDK\Http\ApiException $e) {
-            $sdk = false;
-            // exit("Unable to authenticate to platform. Check credentials. " . $e->message . PHP_EOL);
+            //$sdk = false;
+            show_errors();
+             exit("Unable to authenticate to platform. Check credentials. <br/><br/>" . echo_spaces("error object", $e) . PHP_EOL);
         }
     }
     return $sdk ;
