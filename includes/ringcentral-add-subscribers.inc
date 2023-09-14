@@ -8,7 +8,8 @@
 /* show_form */
 /* ========= */
 Function show_form($message, $label = "", $color = "green") {	
-	global $print_again, $wpdb;  ?>		
+	global $print_again, $wpdb;  ?>
+
 	<form action="" method="post" >
 	<table class="TableOverride" >
 		<tr class="TableOverride">
@@ -43,7 +44,7 @@ Function show_form($message, $label = "", $color = "green") {
 			<p style='display: inline; <?php if ($label == "mobile") echo "color:red"; ?>' >mobile:</p>			
 		</td>
 		<td class="right_col">
-			<input type="text" name="mobile" onkeydown="return isNumberKey(event)"
+			<input type="text" name="mobile"
                    value="<?php if ($print_again) { echo sanitize_text_field($_POST['mobile']) ; } ?>">
 		</td>
 	</tr>

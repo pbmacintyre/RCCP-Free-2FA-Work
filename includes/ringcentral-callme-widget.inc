@@ -12,7 +12,7 @@ class ringcentral_callme_widget extends WP_Widget {
         );
         $this->WP_Widget(
             'ring_central_callme_widget',
-            'RCCP-Free Call Me Widget',
+            'RingCentral Free Call Me Widget',
             $widget_ops );
     }    
     // build the widget settings form

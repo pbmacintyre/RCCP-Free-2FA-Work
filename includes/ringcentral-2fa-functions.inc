@@ -371,7 +371,7 @@ function ringcentral_2fa_edit_profile ($selected_user_obj) { ?>
                     </div>
                     <?php
                     if (!$pinValidated) { ?>
-                        <p style='color: red; '>PIN was NOT yet Validated ! </p>
+                        <p style='color: red; '>PIN was NOT yet validated!</p>
                     <?php  } ?>
                 </td>
             </tr>

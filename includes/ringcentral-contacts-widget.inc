@@ -12,7 +12,7 @@ class ringcentral_contacts_widget extends WP_Widget {
         );
         $this->WP_Widget(
             'ring_central_contacts_widget',
-            'RCCP-Free Contacts Widget',
+            'RingCentral Free Contacts Widget',
             $widget_ops );
     }
     

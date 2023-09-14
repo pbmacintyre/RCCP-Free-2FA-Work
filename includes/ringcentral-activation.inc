@@ -127,8 +127,8 @@ if (!$row_exists) {
 /* build email confirmation page if needed */
 /* permainks must be set to "Post name"    */
 /* ======================================= */
-$new_page_title = 'eMail Confirmation';
-$new_page_content = 'email-confirmed ... thanks for that !';
+$new_page_title = 'RingCentral eMail Confirmation';
+$new_page_content = 'email-confirmed ... thanks for joining our distribution list!';
 $new_page_template = '';
 $page_check = get_page_by_title($new_page_title);
 $new_page = array(
@@ -147,7 +147,7 @@ if(!isset($page_check->ID)){
 /* =================================================== */
 /* build email unsubscribe confirmation page if needed */
 /* =================================================== */
-$new_page_title = 'eMail Unsubscribe';
+$new_page_title = 'RingCentral eMail Unsubscribe';
 $new_page_content = 'You have been unsubscribed from the email list ... Sorry to see you go.';
 $new_page_template = '';
 $page_check = get_page_by_title($new_page_title);

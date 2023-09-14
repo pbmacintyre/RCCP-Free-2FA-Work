@@ -25,7 +25,6 @@ See License URI for full details.
 Copyright (C) 2019-2023 Paladin Business Solutions
 */
 
-
 /* ============================== */
 /* Set RingCentral Constant values */
 /* ============================== */

@@ -29,7 +29,7 @@
 
 .left_col {
 	width: 35% !important ;
-	vertical-align: top;
+	vertical-align: top !important ;
     /* background-color: red !important ; */
 }
 .right_col {

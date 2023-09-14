@@ -150,8 +150,7 @@ if ($current_action !== 'delete' && $current_action !== 'edit') {
 }
 
 if ($current_action === 'delete') {
-    $message = '<div class="updated below-h2" id="message"><p>' 
-        . sprintf('Items deleted: %d', count($_REQUEST['id'])) . '</p></div>';
+    $message = "<div class='updated below-h2' id='message'><p>Item(s) successfully deleted.</p></div>";
 }
 
 // if ($current_action === 'edit') {
