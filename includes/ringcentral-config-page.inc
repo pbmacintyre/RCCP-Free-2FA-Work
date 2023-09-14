@@ -38,7 +38,7 @@ Function show_form($message, $label = "", $color = "#008EC2") {
 	}
 	
 	$result_rc = $wpdb->get_row( $wpdb->prepare("SELECT * FROM `ringcentral_control` WHERE `ringcentral_control_id` = %d", 1) );
-	
+
 	?></td>
 	</tr>	
 	<tr class="TableOverride">
@@ -146,7 +146,7 @@ Function show_form($message, $label = "", $color = "#008EC2") {
 		  if ($print_again) {
 		      echo sanitize_text_field($_POST['ringcentral_user_name']);
           } else {             
-              if ($result_rc->ringcentral_user_name) {
+              if ($result_rc->ringcentral_user_name != "") {
                 echo $result_rc->ringcentral_user_name ;
               } else {
                 echo "" ;
@@ -200,7 +200,7 @@ Function show_form($message, $label = "", $color = "#008EC2") {
           if ($print_again) {
               echo sanitize_text_field($_POST['recaptcha_site']);
           } else {             
-              if ($result_rc->grc_site_key) {
+              if ($result_rc->grc_site_key != "") {
                 echo $result_rc->grc_site_key ;
               } 
           }

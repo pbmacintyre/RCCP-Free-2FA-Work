@@ -17,10 +17,7 @@ $ringcentral_sql = "CREATE TABLE `ringcentral_control` (
   `jwt_key` text NOT NULL,
   `webhook_token` VARCHAR(100) NULL,  
   `ringcentral_user_name` varchar(50) NOT NULL,  
-  `ringcentral_sandbox` TINYINT NOT NULL,
-  `embed_width` SMALLINT(4) NOT NULL,
-  `embed_height` SMALLINT(4) NOT NULL,		
-  `enable_glip` tinyint(4) NOT NULL,
+  `ringcentral_sandbox` TINYINT NOT NULL,  
   `email_updates` tinyint(4) NOT NULL,
   `mobile_updates` tinyint(4) NOT NULL,
   `token_prefix` varchar(10) NOT NULL,
@@ -42,9 +39,17 @@ if (!$row_exists) {
         array(
             'ringcentral_control_id' => 1,
             'embedded_phone' => 0,
+            'jwt_key' => "",
+            'webhook_token' => "",
+            'ringcentral_user_name' => "",
             'ringcentral_sandbox' => 0,
             'email_updates' => 1,
             'mobile_updates' => 0,            
+            'token_prefix' => 0,
+            'grc_site_key' => "",
+            'grc_secret_key' => "",
+            'oauth_client' => "",
+            'oauth_secret' => "",
             )
         );
 }
