@@ -317,6 +317,7 @@ function ringcentral_2fa_edit_profile ($selected_user_obj) { ?>
             When enabling 2FA you are agreeing to be sent a pin code via SMS which will be required to complete the
             login process.</div>
     <?php } else { ?>
+        <br/>
         <img src="<?php echo RINGCENTRAL_FULL_LOGO ?>">
         <h3>RingCentral Two-Factor Authentication Settings </h3>
         <div style="margin-top: 5px; width: 45%; border: 1px solid #004F6D; padding: 5px; background: #DAF0F8;">

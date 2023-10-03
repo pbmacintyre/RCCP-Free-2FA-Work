@@ -593,7 +593,7 @@ add_filter('plugin_row_meta', 'ringcentral_add_plugin_links', 10, 2);
 //Add a link on the plugin control line after 'view details'
 function ringcentral_add_plugin_links($links, $file) {
     if ( $file == plugin_basename(dirname(__FILE__).'/ringcentral.php') ) {
-        $links[] = '<a href="https://paladin-bs.com/ringcentral_plugin/setup_guide.pdf" target="_blank">' . esc_html__('Setup Guide', 'ringcentral') . '</a>';
+        $links[] = '<a href="https://paladin-bs.com/wp-content/uploads/2023/10/RingCentral_free_user_guide_1_5.pdf" target="_blank">' . esc_html__('Setup Guide', 'ringcentral') . '</a>';
     }
     return $links;
 }

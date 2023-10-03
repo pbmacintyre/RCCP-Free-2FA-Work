@@ -45,7 +45,7 @@ function ringcentral_sdk($settings_data = "") {
             $sdk->platform()->login( [ "jwt" => $jwt_key ] );
         } catch (\RingCentral\SDK\Http\ApiException $e) {
             //$sdk = false;
-             exit("Unable to authenticate to platform. Check your RingCentral credentials. <br/><br/>") ;
+             exit("<br/><br/>Unable to authenticate to platform. Check your RingCentral credentials. <br/><br/>") ;
         }
     }
     return $sdk ;
