@@ -92,7 +92,11 @@ Function show_form($message, $label = "", $color = "#008EC2") {
           }
             ?>></td>
 	</tr>
-    
+    <tr>
+        <td colspan=2>
+            <hr>
+        </td>
+    </tr>
     <tr class="TableOverride">
         <td class="left_col">
             <p style='display: inline; <?php if ($label == "ringcentral_sandbox") echo "color:red"; ?>' >Use the RingCentral SANDBOX Environment?</p>
@@ -112,11 +116,6 @@ Function show_form($message, $label = "", $color = "#008EC2") {
           }
             ?>></td>
     </tr>
-    <tr>
-        <td colspan=2>
-        	<hr>
-        </td>
-    </tr>	
 	<?php /* ============================================== */ ?>
     <tr class="TableOverride">
         <td class="left_col">
@@ -159,6 +158,11 @@ Function show_form($message, $label = "", $color = "#008EC2") {
 		
 		</td>
 	</tr>
+    <tr>
+        <td colspan=2>
+            <hr>
+        </td>
+    </tr>
 	<tr class="TableOverride">
 		<td class="left_col">
 			<p style='display: inline; <?php if ($label == "token_prefix") echo "color:red"; ?>' >Token Prefix:</p>
@@ -247,7 +251,8 @@ Function check_form() {
 	
 	global $print_again, $wpdb;
 
-	$label = "" ;
+    $print_again = false;
+    $label = "" ;
 	$message = "" ;
 	
 	if ($_POST['ringcentral_sandbox'] == "on") {
@@ -258,18 +263,35 @@ Function check_form() {
 	
 	$form_data = array(
 	    "jwt_key"          => sanitize_text_field($_POST['jwt_key']),
-	    "sandbox"          => $sandbox 	    
+	    "sandbox"          => $sandbox
 	);
+    $givenPhone = sanitize_text_field( $_POST['ringcentral_user_name'] ) ;
 
 	$GRCSite   = $_POST["recaptcha_site"] ;
 	$GRCSecret = $_POST["recaptcha_secret"] ;
 
-// 	/* data integrity checks */	
-	if (!ringcentral_sdk($form_data) ) {
+    /* SDK setup for testing and validation */
+    $valid_SDK = ringcentral_sdk($form_data) ;
+    $SmsSender = sms_enabled_phone_number($valid_SDK, $givenPhone ) ;
+
+    /* data integrity checks */
+    if (!$SmsSender) {
+        $print_again = true;
+        $message = "The entered phone number does not have SMS sending permission, please verify and try again";
+    }
+    if ($valid_SDK == 0 ) {
 	    $print_again = true;
-	    $label = "";
-	    $message = "There was an error validating your RingCentral account credentials, please verify and try again";
+	    $message = "There was an error validating your RingCentral JWT key credentials, please verify and try again";
 	}
+    /* =============================================================================== */
+    /* save JWT, SmsSender Phone number, and sandbox value to DB if they are validated */
+    /* =============================================================================== */
+    if (!$print_again) {
+        $jwt_sql = $wpdb->prepare("UPDATE `ringcentral_control` SET `jwt_key` = %s, `ringcentral_user_name` = %s, `ringcentral_sandbox` = %d
+            WHERE `ringcentral_control_id` = %d", $form_data['jwt_key'], $_POST['ringcentral_user_name'], $sandbox, 1);
+        $wpdb->query($jwt_sql);
+    }
+    /* =============================================================================== */
     if ($form_data["jwt_key"] == "") {
         $print_again = true;
         $label = "jwt_key";
@@ -290,8 +312,7 @@ Function check_form() {
 	    $label = "recaptcha_secret";
 	    $message = "Google ReCaptcha Secret Key cannot be blank.";
 	}
-
-	// end data integrity checking
+	/* end data integrity checking */
 
 	if ($print_again == true) {
 		$color = "red" ;

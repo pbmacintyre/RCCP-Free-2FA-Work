@@ -44,11 +44,44 @@ function ringcentral_sdk($settings_data = "") {
         try {
             $sdk->platform()->login( [ "jwt" => $jwt_key ] );
         } catch (\RingCentral\SDK\Http\ApiException $e) {
-            //$sdk = false;
-             exit("<br/><br/>Unable to authenticate to platform. Check your RingCentral credentials. <br/><br/>") ;
+            $sdk = 0;
+            // exit("<br/><br/>Unable to authenticate to platform. Check your RingCentral credentials. <br/><br/>") ;
         }
     }
-    return $sdk ;
+   return $sdk ;
+}
+
+
+/* ================================================ */
+/* Validate entered phone number has SMS permission */
+/* ================================================ */
+function sms_enabled_phone_number ($sdk, $phoneNum) {
+    if ($sdk <> 0 ) {
+        try {
+            $responseObject = $sdk->platform()->get('/restapi/v1.0/account/~/extension/~/phone-number');
+            $responseArray = json_decode($responseObject->body()->getContents(), true);
+
+            foreach ($responseArray['records'] as $value) {
+                if (in_array("SmsSender", $value['features'])) {
+                    $phoneArray[] = $value['phoneNumber'];
+                }
+            }
+        }
+        catch (\RingCentral\SDK\Http\ApiException $e) {
+            // Another way to get message, but keep in mind, that there could be no response if request has failed completely
+            echo_spaces("API error Response", $e->getMessage());
+        }
+
+        if (in_array($phoneNum, $phoneArray)) {
+            $returnValue = true;
+        } else {
+            $returnValue = false;
+        }
+    } else {
+        $returnValue = false;
+    }
+
+    return $returnValue ;
 }
 
 /* =============================== */
@@ -82,7 +115,6 @@ function ringcentral_send_welcome_mobile($to, $token, $full_name) {
     
     $sdk = ringcentral_sdk() ;
     try {
-        // echo "in try...";
         $apiResponse = $sdk->platform()->post('/account/~/extension/~/sms',
             array('from' => array('phoneNumber' => $from),
                 'to'   => array( array('phoneNumber' => $to) ),

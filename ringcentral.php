@@ -576,8 +576,9 @@ function ringcentral_admin_login_2fa_verify ($wpUser, $redirect_to, $remember_me
             ?>
             <div id="login_error"><?php echo esc_html(implode('<br />', $errors)) ?></div>
             <div class="message" id="v-code" style="display: none;">
-                <a href="https://rccp-free.paladin-bs.com/wp-admin">Click here to re-start the login process.
-                    <br/>We will send you another code.</a>
+                <?php $websiteURL = get_site_url(null, null, 'https') . "/wp-admin" ; ?>
+                <a href="<?php echo $websiteURL; ?>">Click here to re-start the login process.
+                    <br/>You will be sent another code.</a>
             </div>
 
         <?php } ?>

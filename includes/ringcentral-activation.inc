@@ -114,7 +114,7 @@ if (!$row_exists) {
     $wpdb->query( $wpdb->prepare("INSERT INTO `ringcentral_help`
       (`ringcentral_help_id`, `ringcentral_help_field`, `ringcentral_help_help`)
       VALUES (%d, %s, %s)",
-        1, "username", "Main Company Phone Number" ) );
+        1, "username", "The phone number showing under the JWT code on the RingCentral Developers Credentials site - see Appendix A in the user guide for more specific instructions." ) );
     $wpdb->query( $wpdb->prepare("INSERT INTO `ringcentral_help`
       (`ringcentral_help_id`, `ringcentral_help_field`, `ringcentral_help_help`)
       VALUES (%d, %s, %s)",
