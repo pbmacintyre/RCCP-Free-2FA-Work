@@ -4,8 +4,8 @@ Plugin Name: RingCentral
 Plugin URI:  https://ringcentral.com
 Description: RingCentral Communications Plugin - FREE
 Author:      Peter MacIntyre
-Version:     1.5
-Author URI:  https://paladin-bs.com/peter-macintyre
+Version:     1.5.3
+Author URI:  https://paladin-bs.com/about
 Details URI: https://paladin-bs.com
 License:     GPL2
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -602,10 +602,12 @@ function ringcentral_add_plugin_links($links, $file) {
 
 add_action('authenticate', 'RingCentral_2fa_intercept', 10, 3);
 
-add_action('show_user_profile', 'ringcentral_2fa_user_settings');
-add_action('edit_user_profile', 'ringcentral_2fa_user_settings');
+add_action('show_user_profile', 'ringcentral_2fa_user_settings');  // other users
+add_action('edit_user_profile', 'ringcentral_2fa_user_settings');   // your own profile
+
 add_action('personal_options_update', 'ringcentral_2fa_save_settings');
 add_action('edit_user_profile_update', 'ringcentral_2fa_save_settings');
+
 add_action('user_profile_update_errors', 'ringcentral_2fa_form_settings_validation', 10, 3);
 
 ?>
