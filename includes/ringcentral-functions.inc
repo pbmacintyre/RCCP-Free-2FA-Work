@@ -331,5 +331,8 @@ function post_tm_chat($rcsdk, $chatId, $team_chat) {
 function ringcentral_admin_page_top () { ?>
     <img id='page_title_img' title="RingCentral Plugin" src="<?= RINGCENTRAL_LOGO; ?>">
         &nbsp;&nbsp;
-        <h1 id='page_title'><?= esc_html(get_admin_page_title()); ?></h1>
-<?php } ?>
+        <h1 id='page_title'><?php echo esc_html(get_admin_page_title()); ?></h1>
+<?php }
+function ringcentral_plugin_version () {
+    echo "<p style='font-size: small'> Version: " . RINGCENTRAL_PLUGIN_VERSION . "</p>";
+} ?>

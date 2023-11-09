@@ -243,6 +243,7 @@ Function show_form($message, $label = "", $color = "#008EC2") {
 	</table>
 	</form>
 <?php
+    ringcentral_plugin_version () ;
 }
 /* ========== */
 /* check_form */

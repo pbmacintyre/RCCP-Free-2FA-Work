@@ -67,6 +67,7 @@ Function show_form($message, $label = "", $color = "green") {
 	</table>
 	</form>
 <?php
+    ringcentral_plugin_version () ;
 }
 
 /* ========== */

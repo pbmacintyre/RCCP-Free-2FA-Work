@@ -2,8 +2,8 @@
 Contributors:      pbmacintyre
 Tags:              Ring Central Communications API tools
 Requires at least: 6.3.0
-Tested up to:      6.3.1
-Stable tag:        1.5.3
+Tested up to:      6.4.1
+Stable tag:        1.5.4
 Requires PHP:      8.0.2
 License:           GPLv2 or later
 License URI:       https://www.gnu.org/licenses/gpl-2.0.html

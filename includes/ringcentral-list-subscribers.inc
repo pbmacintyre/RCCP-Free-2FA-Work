@@ -194,4 +194,6 @@ if ($current_action === 'edit') {
         <!-- Now we can render the completed list table -->
         <?php $myListTable->display() ?>
     </form>
-<?php } ?>
+<?php }
+ringcentral_plugin_version () ;
+?>

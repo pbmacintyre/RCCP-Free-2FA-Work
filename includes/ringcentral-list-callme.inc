@@ -169,4 +169,6 @@ if ($current_action === 'delete') {
     <!-- Now we can render the completed list table -->
     <?php $myListTable->display() ?>
 </form>
-<?php // } ?>
+<?php
+ringcentral_plugin_version () ;
+?>
