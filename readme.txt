@@ -2,8 +2,8 @@
 Contributors:      pbmacintyre
 Tags:              Ring Central Communications API tools
 Requires at least: 6.3.0
-Tested up to:      6.4.1
-Stable tag:        1.5.4
+Tested up to:      6.4.2
+Stable tag:        1.5.5
 Requires PHP:      8.0.2
 License:           GPLv2 or later
 License URI:       https://www.gnu.org/licenses/gpl-2.0.html
@@ -119,10 +119,15 @@ use of this plug in, but currently you do need to have a developer account.
 = 1.4.2 =
 * Updated User Guide with Appendix A - Guide to create app on RingCentral Developers site.
 = 1.4.5 =
-* Ensured compatability with WordPress 5.8.1. 
+* Ensured compatability with WordPress 5.8.1
 = 1.5 =
-* Ensured compatability with WordPress 6.3.1.
+* Ensured compatability with WordPress 6.3.1
 * Added 2FA SMS 6 digit code admin validation to login process and user profiles
+= 1.5.4 =
+* Ensured compatability with WordPress 6.4.1
+= 1.5.5 =
+* Ensured compatability with WordPress 6.4.2
+* Added settings control to allow for empty JWT and phone number credentials
 
 == Upgrade Notice ==
 == Contribute ==

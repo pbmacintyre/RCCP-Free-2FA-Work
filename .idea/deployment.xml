@@ -1,34 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="PublishConfigData" serverName="Chris Server" remoteFilesAllowedToDisappearOnAutoupload="false" confirmBeforeUploading="false">
+  <component name="PublishConfigData" serverName="Paladin on Bluehost" remoteFilesAllowedToDisappearOnAutoupload="false" confirmBeforeUploading="false">
     <option name="confirmBeforeUploading" value="false" />
     <serverData>
-      <paths name="Chris Server">
+      <paths name="Paladin - Available Updates">
         <serverdata>
           <mappings>
-            <mapping deploy="/" local="$PROJECT_DIR$/../RCCP-Chris" web="/" />
-          </mappings>
-        </serverdata>
-      </paths>
-      <paths name="Greens on Paladin">
-        <serverdata>
-          <mappings>
-            <mapping local="$PROJECT_DIR$" web="/" />
-          </mappings>
-        </serverdata>
-      </paths>
-      <paths name="Paladin Dev Server">
-        <serverdata>
-          <mappings>
-            <mapping deploy="/" local="$PROJECT_DIR$" web="/" />
+            <mapping deploy="" local="$PROJECT_DIR$" web="https://paladin-bs.com" />
+            <mapping deploy="/" local="$PROJECT_DIR$/../Available Updates" web="https://paladin-bs.com" />
           </mappings>
         </serverdata>
       </paths>
       <paths name="Paladin on Bluehost">
         <serverdata>
           <mappings>
-            <mapping deploy="/" local="$PROJECT_DIR$/../Creativo-Child_Theme/creativo-child" web="/" />
-            <mapping local="$PROJECT_DIR$" />
+            <mapping deploy="/" local="$PROJECT_DIR$" web="/" />
+          </mappings>
+        </serverdata>
+      </paths>
+      <paths name="Shopify App Location">
+        <serverdata>
+          <mappings>
+            <mapping deploy="/" local="$PROJECT_DIR$/../shopify_App" web="/" />
           </mappings>
         </serverdata>
       </paths>

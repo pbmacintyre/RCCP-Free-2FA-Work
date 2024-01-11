@@ -4,7 +4,7 @@ Plugin Name: RingCentral
 Plugin URI:  https://ringcentral.com
 Description: RingCentral Communications Plugin - FREE
 Author:      Peter MacIntyre
-Version:     1.5.4
+Version:     1.5.5
 Author URI:  https://paladin-bs.com/about
 Details URI: https://paladin-bs.com
 License:     GPL2

@@ -5,6 +5,7 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="Creativo-Child_Theme" />
-    <orderEntry type="module" module-name="RCCP-Chris" />
+    <orderEntry type="module" module-name="Available Updates" />
+    <orderEntry type="module" module-name="shopify_App" />
   </component>
 </module>

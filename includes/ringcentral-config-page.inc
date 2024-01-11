@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (C) 2019-2023 Paladin Business Solutions
+ * Copyright (C) 2019-2024 Paladin Business Solutions
  *
  */
 
@@ -9,7 +9,7 @@
 /* ========= */
 Function show_form($message, $label = "", $color = "#008EC2") {
 
-	global $print_again, $wpdb;
+	global $print_again, $wpdb, $valid_sdk;
 
 	if (ringcentral_CheckPro()) { ?>
         <form action="<?php echo RINGCENTRAL_PRO_URL ?>" target="_blank" style="padding-left: 15%;">
@@ -105,11 +105,13 @@ Function show_form($message, $label = "", $color = "#008EC2") {
                       
         </td>
         <td class="right_col"><input type="checkbox" name="ringcentral_sandbox" <?php 
-        if ($print_again) { 
-            if ($_POST['ringcentral_sandbox'] == "on") {
-              echo 'CHECKED';
-            } 
-          } else {             
+        if ($print_again) {
+            if ($valid_sdk == 0) {
+                 echo ' ';
+            } else {
+                if ($_POST['ringcentral_sandbox'] == "on") { echo 'CHECKED'; }
+            }
+          } else {
               if ($result_rc->ringcentral_sandbox  == 1) {
                   echo 'CHECKED' ;
                 }
@@ -124,7 +126,11 @@ Function show_form($message, $label = "", $color = "#008EC2") {
         </td>
         <td class="right_col"><textarea name="jwt_key" rows="5"><?php
             if ($print_again) {
-                echo sanitize_text_field($_POST['jwt_key']);
+                if ($valid_sdk == 0) {
+                    echo ' ';
+                } else {
+                    echo sanitize_text_field($_POST['jwt_key']);
+                }
             } else {
                 if ($result_rc->jwt_key) {
                     echo $result_rc->jwt_key ;
@@ -143,7 +149,11 @@ Function show_form($message, $label = "", $color = "#008EC2") {
 		</td>
 		<td class="right_col" ><input type="text" name="ringcentral_user_name" value="<?php
 		  if ($print_again) {
-		      echo sanitize_text_field($_POST['ringcentral_user_name']);
+		      if ($valid_sdk == 0) {
+                    echo ' ';
+                } else {
+                  echo sanitize_text_field($_POST['ringcentral_user_name']);
+              }
           } else {             
               if ($result_rc->ringcentral_user_name != "") {
                 echo $result_rc->ringcentral_user_name ;
@@ -290,6 +300,11 @@ Function check_form() {
     if (!$print_again) {
         $jwt_sql = $wpdb->prepare("UPDATE `ringcentral_control` SET `jwt_key` = %s, `ringcentral_user_name` = %s, `ringcentral_sandbox` = %d
             WHERE `ringcentral_control_id` = %d", $form_data['jwt_key'], $_POST['ringcentral_user_name'], $sandbox, 1);
+        $wpdb->query($jwt_sql);
+    } else {
+        // blank this data so old values are not kept
+        $jwt_sql = $wpdb->prepare("UPDATE `ringcentral_control` SET `jwt_key` = %s, `ringcentral_user_name` = %s, `ringcentral_sandbox` = %d
+            WHERE `ringcentral_control_id` = %d", "", "", "", 1);
         $wpdb->query($jwt_sql);
     }
     /* =============================================================================== */

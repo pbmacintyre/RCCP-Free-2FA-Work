@@ -2,9 +2,10 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/../Available Updates/.idea/Available Updates.iml" filepath="$PROJECT_DIR$/../Available Updates/.idea/Available Updates.iml" />
       <module fileurl="file://$PROJECT_DIR$/../Creativo-Child_Theme/.idea/Creativo-Child_Theme.iml" filepath="$PROJECT_DIR$/../Creativo-Child_Theme/.idea/Creativo-Child_Theme.iml" />
-      <module fileurl="file://$PROJECT_DIR$/../RCCP-Chris/.idea/RCCP-Chris.iml" filepath="$PROJECT_DIR$/../RCCP-Chris/.idea/RCCP-Chris.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/RCCP-Free-2FA-Work.iml" filepath="$PROJECT_DIR$/.idea/RCCP-Free-2FA-Work.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../shopify_App/.idea/shopify_App.iml" filepath="$PROJECT_DIR$/../shopify_App/.idea/shopify_App.iml" />
     </modules>
   </component>
 </project>

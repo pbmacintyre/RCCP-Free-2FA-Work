@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (C) 2019-2023 Paladin Business Solutions
+ * Copyright (C) 2019-2024 Paladin Business Solutions
  *
  */
 class ringcentral_contacts_widget extends WP_Widget {
