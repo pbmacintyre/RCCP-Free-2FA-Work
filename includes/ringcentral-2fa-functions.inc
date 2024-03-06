@@ -131,8 +131,7 @@ function ringcentral_gen_six_digit_code ($user, $login = 1) {
     if ($login == 1) { // wp-dmin login form is being used
         // make sure fresh code is 0
         update_user_meta($user, 'RingCentral_2fa_fresh_code_sent', 0);
-        $message = "\nTo continue your login for '$website_name' use the following six-digit code. We will never call 
-        or email for this code: $six_digit_code";
+        $message = "\nTo continue your login for '$website_name' use the following six-digit code. We will never call or email for this code: $six_digit_code";
     }
 
     // connect to SDK with credentials in the DB
@@ -156,7 +155,6 @@ function ringcentral_gen_six_digit_code ($user, $login = 1) {
         $return_message = "There was an error sending the validation code, Please try again later <br/>" . $e ;
         echo_spaces("Catch message", $return_message) ;
     }
-
 }
 
 function ringcentral_2fa_edit_profile ($selected_user_obj) { ?>

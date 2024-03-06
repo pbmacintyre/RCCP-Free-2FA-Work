@@ -22,7 +22,7 @@ GNU General Public License for more details.
  
 See License URI for full details.
 
-Copyright (C) 2019-2023 Paladin Business Solutions
+Copyright (C) 2019-2024 Paladin Business Solutions
 */
 
 /* ============================== */
@@ -51,7 +51,7 @@ if (!defined('RINGCENTRAL_LOGO')) {
     define('RINGCENTRAL_LOGO', RINGCENTRAL_PLUGINURL . 'images/rc_logo_60_60.jpg');
 }
 if (!defined('RINGCENTRAL_FULL_LOGO')) {
-    define('RINGCENTRAL_FULL_LOGO', RINGCENTRAL_PLUGINURL . 'images/ringcentral-full-logo.png');
+    define('RINGCENTRAL_FULL_LOGO', RINGCENTRAL_PLUGINURL . 'images/rc-logo.png');
 }
 /* ============================== */
 /* bring in PHP utility functions */
@@ -482,11 +482,11 @@ function RingCentral_2fa_intercept ($user, $username, $password) {
 }
 
 function ringcentral_admin_login_2fa_verify ($wpUser, $redirect_to, $remember_me) {
-    // the validation code form was submitted
     if (isset($_POST['RC_Validate_submit'])) {
+        // the validation code form was submitted
         // 6 digit code was sent... and form was submitted with user response.
         // check that the sent validation code matches the session value
-        if ($_POST['ringcentral_2fa_code'] == $_SESSION['six_digit_code']) {
+        if ($_POST['ringcentral_2fa_code'] == $_POST['validation_code']) {
             $errors = [];
             wp_set_auth_cookie($wpUser->ID, $remember_me);
             wp_safe_redirect($redirect_to);
@@ -536,9 +536,9 @@ function ringcentral_admin_login_2fa_verify ($wpUser, $redirect_to, $remember_me
     $phone_number = trim(get_user_meta($wpUser->ID, 'RingCentral_2fa_user_mobile', true) );
     $phone_partial = substr($phone_number, -4);
 
-    wp_logout();
-    nocache_headers();
-    header('Content-Type: ' . get_bloginfo('html_type') . '; charset=' . get_bloginfo('charset'));
+//    wp_logout();
+//    nocache_headers();
+//    header('Content-Type: ' . get_bloginfo('html_type') . '; charset=' . get_bloginfo('charset'));
 
     ?>
     <div class="center_2fa">
@@ -563,9 +563,10 @@ function ringcentral_admin_login_2fa_verify ($wpUser, $redirect_to, $remember_me
                     <input type="submit" name="RC_Validate_submit" id="buttonControl"
                            class="button button-primary button-large" value="Validate Code"/>
 
-                    <input type="hidden" name="log" value="<?php echo esc_attr($wpUser->user_login) ?>">
-                    <input type="hidden" name="ringcentral_post_token" value="<?php echo esc_attr($post_token) ?>"/>
-                    <input type="hidden" name="redirect_to" value="<?php echo esc_attr($redirect_to) ?>">
+                    <input type="hidden" name="validation_code" value="<?php echo $_SESSION['six_digit_code']; ?>">
+                    <input type="hidden" name="log" value="<?php echo esc_attr($wpUser->user_login); ?>">
+                    <input type="hidden" name="ringcentral_post_token" value="<?php echo esc_attr($post_token); ?>"/>
+                    <input type="hidden" name="redirect_to" value="<?php echo esc_attr($redirect_to); ?>">
 
                     <?php if ($remember_me) { ?>
                         <input type="hidden" name="remember_me" value="forever"/>
@@ -574,7 +575,7 @@ function ringcentral_admin_login_2fa_verify ($wpUser, $redirect_to, $remember_me
             </form>
         <?php }
         if (!empty($errors)) {
-            login_header('RingCentral', '<p> </p>');
+           login_header('RingCentral', '<p> </p>');
             ?>
             <div id="login_error"><?php echo esc_html(implode('<br />', $errors)) ?></div>
             <div class="message" id="v-code" style="display: none;">
@@ -583,8 +584,7 @@ function ringcentral_admin_login_2fa_verify ($wpUser, $redirect_to, $remember_me
                     <br/>You will be sent another code.</a>
             </div>
 
-        <?php } ?>
-        <?php
+        <?php }
         // login_footer();
         exit; ?>
     </div>

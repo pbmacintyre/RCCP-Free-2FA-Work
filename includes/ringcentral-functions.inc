@@ -109,7 +109,7 @@ function ringcentral_send_welcome_email($email, $token, $full_name) {
 function ringcentral_send_welcome_mobile($to, $token, $full_name) {
     $message = "Hi $full_name: Thanks for joining our newsletter sign up process. [If this was not you please ignore this message]\n\n";
     $message .= "If you also signed up for email notifications you will receive a separate confirmation email in that regard.\n\n";
-    $message .= "Please reply by text with 'START' to confirm your SMS subscription to our mailing list: ";
+    $message .= "Please reply by text with 'START' to confirm your SMS subscription to our mailing list. ";
     
     $from = ringcentral_get_from_phone();
     
