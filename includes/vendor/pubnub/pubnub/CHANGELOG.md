@@ -1,3 +1,30 @@
+## v6.1.3
+November 27 2023
+
+#### Fixed
+- Gracefully handle decrypting an unencrypted method. If a decryption error occurs when trying to decrypt plain text, the plain text message will be returned and an error field will be set in the response. This works for both history and subscription messages.
+
+## v6.1.2
+November 02 2023
+
+#### Modified
+- Fix license info in composer.json
+
+## v6.1.1
+October 30 2023
+
+#### Fixed
+- Changed license type from MIT to PubNub Software Development Kit License.
+
+## v6.1.0
+October 16 2023
+
+#### Added
+- Add crypto module that allows configure SDK to encrypt and decrypt messages.
+
+#### Fixed
+- Improved security of crypto implementation by adding enhanced AES-CBC cryptor.
+
 ## v6.0.1
 May 18 2023
 

@@ -7,5 +7,7 @@
     <orderEntry type="module" module-name="Creativo-Child_Theme" />
     <orderEntry type="module" module-name="Available Updates" />
     <orderEntry type="module" module-name="shopify_App" />
+    <orderEntry type="module" module-name="Finserv_blog" />
+    <orderEntry type="module" module-name="Finserv-Blog-Repo" />
   </component>
 </module>

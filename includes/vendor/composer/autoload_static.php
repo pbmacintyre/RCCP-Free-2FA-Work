@@ -59,6 +59,10 @@ class ComposerStaticInit68cda7a9ea8011506fb2654c4d268eb5
             'GuzzleHttp\\' => 11,
             'GrahamCampbell\\ResultType\\' => 26,
         ),
+        'E' => 
+        array (
+            'Evenement\\' => 10,
+        ),
         'D' => 
         array (
             'Dotenv\\' => 7,
@@ -136,8 +140,8 @@ class ComposerStaticInit68cda7a9ea8011506fb2654c4d268eb5
         ),
         'Psr\\Http\\Message\\' => 
         array (
-            0 => __DIR__ . '/..' . '/psr/http-message/src',
-            1 => __DIR__ . '/..' . '/psr/http-factory/src',
+            0 => __DIR__ . '/..' . '/psr/http-factory/src',
+            1 => __DIR__ . '/..' . '/psr/http-message/src',
         ),
         'Psr\\Http\\Client\\' => 
         array (
@@ -167,19 +171,13 @@ class ComposerStaticInit68cda7a9ea8011506fb2654c4d268eb5
         array (
             0 => __DIR__ . '/..' . '/graham-campbell/result-type/src',
         ),
+        'Evenement\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/evenement/evenement/src',
+        ),
         'Dotenv\\' => 
         array (
             0 => __DIR__ . '/..' . '/vlucas/phpdotenv/src',
-        ),
-    );
-
-    public static $prefixesPsr0 = array (
-        'E' => 
-        array (
-            'Evenement' => 
-            array (
-                0 => __DIR__ . '/..' . '/evenement/evenement/src',
-            ),
         ),
     );
 
@@ -198,7 +196,6 @@ class ComposerStaticInit68cda7a9ea8011506fb2654c4d268eb5
         return \Closure::bind(function () use ($loader) {
             $loader->prefixLengthsPsr4 = ComposerStaticInit68cda7a9ea8011506fb2654c4d268eb5::$prefixLengthsPsr4;
             $loader->prefixDirsPsr4 = ComposerStaticInit68cda7a9ea8011506fb2654c4d268eb5::$prefixDirsPsr4;
-            $loader->prefixesPsr0 = ComposerStaticInit68cda7a9ea8011506fb2654c4d268eb5::$prefixesPsr0;
             $loader->classMap = ComposerStaticInit68cda7a9ea8011506fb2654c4d268eb5::$classMap;
 
         }, null, ClassLoader::class);
