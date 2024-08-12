@@ -1,12 +1,47 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <module type="WEB_MODULE" version="4">
   <component name="NewModuleRootManager">
-    <content url="file://$MODULE_DIR$" />
+    <content url="file://$MODULE_DIR$">
+      <sourceFolder url="file://$MODULE_DIR$/includes/RingAPI/src" isTestSource="false" packagePrefix="RingCentral\SDK\" />
+      <sourceFolder url="file://$MODULE_DIR$/includes/spec" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/includes/tests" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/spec" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/tests" isTestSource="true" />
+      <excludeFolder url="file://$MODULE_DIR$/includes/vendor/composer" />
+      <excludeFolder url="file://$MODULE_DIR$/includes/vendor/evenement/evenement" />
+      <excludeFolder url="file://$MODULE_DIR$/includes/vendor/graham-campbell/result-type" />
+      <excludeFolder url="file://$MODULE_DIR$/includes/vendor/guzzlehttp/guzzle" />
+      <excludeFolder url="file://$MODULE_DIR$/includes/vendor/guzzlehttp/promises" />
+      <excludeFolder url="file://$MODULE_DIR$/includes/vendor/guzzlehttp/psr7" />
+      <excludeFolder url="file://$MODULE_DIR$/includes/vendor/phpoption/phpoption" />
+      <excludeFolder url="file://$MODULE_DIR$/includes/vendor/psr/event-dispatcher" />
+      <excludeFolder url="file://$MODULE_DIR$/includes/vendor/psr/http-client" />
+      <excludeFolder url="file://$MODULE_DIR$/includes/vendor/psr/http-factory" />
+      <excludeFolder url="file://$MODULE_DIR$/includes/vendor/psr/http-message" />
+      <excludeFolder url="file://$MODULE_DIR$/includes/vendor/psr/log" />
+      <excludeFolder url="file://$MODULE_DIR$/includes/vendor/pubnub/pubnub" />
+      <excludeFolder url="file://$MODULE_DIR$/includes/vendor/ralouphie/getallheaders" />
+      <excludeFolder url="file://$MODULE_DIR$/includes/vendor/ratchet/pawl" />
+      <excludeFolder url="file://$MODULE_DIR$/includes/vendor/ratchet/rfc6455" />
+      <excludeFolder url="file://$MODULE_DIR$/includes/vendor/react/cache" />
+      <excludeFolder url="file://$MODULE_DIR$/includes/vendor/react/dns" />
+      <excludeFolder url="file://$MODULE_DIR$/includes/vendor/react/event-loop" />
+      <excludeFolder url="file://$MODULE_DIR$/includes/vendor/react/promise" />
+      <excludeFolder url="file://$MODULE_DIR$/includes/vendor/react/socket" />
+      <excludeFolder url="file://$MODULE_DIR$/includes/vendor/react/stream" />
+      <excludeFolder url="file://$MODULE_DIR$/includes/vendor/ringcentral/ringcentral-php" />
+      <excludeFolder url="file://$MODULE_DIR$/includes/vendor/rmccue/requests" />
+      <excludeFolder url="file://$MODULE_DIR$/includes/vendor/symfony/deprecation-contracts" />
+      <excludeFolder url="file://$MODULE_DIR$/includes/vendor/symfony/event-dispatcher" />
+      <excludeFolder url="file://$MODULE_DIR$/includes/vendor/symfony/event-dispatcher-contracts" />
+      <excludeFolder url="file://$MODULE_DIR$/includes/vendor/symfony/polyfill-ctype" />
+      <excludeFolder url="file://$MODULE_DIR$/includes/vendor/symfony/polyfill-mbstring" />
+      <excludeFolder url="file://$MODULE_DIR$/includes/vendor/symfony/polyfill-php80" />
+      <excludeFolder url="file://$MODULE_DIR$/includes/vendor/vlucas/phpdotenv" />
+      <excludeFolder url="file://$MODULE_DIR$/includes/vendor/monolog/monolog" />
+    </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="module" module-name="Creativo-Child_Theme" />
-    <orderEntry type="module" module-name="Available Updates" />
-    <orderEntry type="module" module-name="shopify_App" />
     <orderEntry type="module" module-name="Finserv_blog" />
   </component>
 </module>

@@ -28,4 +28,3 @@ function ringcentral_dump_obj($object) {
     var_dump($object);
     echo "</pre>";
 }
-?>

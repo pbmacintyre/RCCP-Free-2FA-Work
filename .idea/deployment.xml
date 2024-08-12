@@ -11,14 +11,6 @@
           </mappings>
         </serverdata>
       </paths>
-      <paths name="Paladin - Available Updates">
-        <serverdata>
-          <mappings>
-            <mapping deploy="" local="$PROJECT_DIR$" web="https://paladin-bs.com" />
-            <mapping deploy="/" local="$PROJECT_DIR$/../Available Updates" web="https://paladin-bs.com" />
-          </mappings>
-        </serverdata>
-      </paths>
       <paths name="Paladin on Bluehost">
         <serverdata>
           <mappings>
