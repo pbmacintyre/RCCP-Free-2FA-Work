@@ -74,7 +74,7 @@ class ringcentral_callme_widget extends WP_Widget {
         $full_name      = sanitize_text_field($FormData['call_full_name']) ;
         $mobile         = sanitize_text_field($FormData['call_mobile']) ;
         $call_reason    = sanitize_text_field($FormData['call_reason']) ;
-        $request_date   = date('Y-m-d', strtotime("now"));
+        $request_date   = date('M j, Y g:i a', strtotime("now"));
               
         /* =================================== */
         /* data integrity checks, data massage */
@@ -131,7 +131,7 @@ class ringcentral_callme_widget extends WP_Widget {
             if ($mobile != "") {                
                 // save with name
                 $wpdb->query( $wpdb->prepare("INSERT INTO `ringcentral_call_requests` 
-                    (`full_name`, `mobile`, `requested_date`, `call_reason`)
+                    (`full_name`, `mobile`, `requested_date_time`, `call_reason`)
                     VALUES (%s, %s, %s, %s)",
                     $full_name, $mobile, $request_date, $call_reason)
                 );                

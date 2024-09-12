@@ -3,8 +3,8 @@
   <component name="PHPUnit">
     <option name="directories">
       <list>
-        <option value="$PROJECT_DIR$/includes/RingAPI/src" />
         <option value="$PROJECT_DIR$/includes/tests" />
+        <option value="$PROJECT_DIR$/includes/RingAPI/src" />
       </list>
     </option>
   </component>

@@ -128,6 +128,9 @@ use of this plug in, but currently you do need to have a developer account.
 = 1.5.5 =
 * Ensured compatability with WordPress 6.4.2
 * Added settings control to allow for empty JWT and phone number credentials
+= 1.6.1 =
+* Ensured compatability with WordPress 6.6.2
+* Added sortable date and time of call me request to admin listing of call me requests
 
 == Upgrade Notice ==
 == Contribute ==

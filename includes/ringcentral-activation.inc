@@ -78,7 +78,7 @@ $ringcentral_sql = "CREATE TABLE `ringcentral_call_requests` (
   `ringcentral_call_requests_id` int(11) NOT NULL AUTO_INCREMENT,
   `full_name` varchar(100) NOT NULL,
   `mobile` varchar(25) NOT NULL,  
-  `requested_date` varchar(10) NOT NULL,
+  `requested_date_time` varchar(50) NOT NULL,
   `call_reason` varchar(500) NOT NULL,
   PRIMARY KEY (`ringcentral_call_requests_id`)
 ) ";

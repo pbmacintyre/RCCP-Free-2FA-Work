@@ -52,17 +52,19 @@ class RC_CallMe_List_Table extends WP_List_Table {
     
     function get_columns() {
         $columns = array(
-            'cb'                => '<input type="checkbox" />', //Render a checkbox instead of text
-            'full_name'         => 'Requested Caller Name',            
-            'mobile'            => 'Mobile #',            
-            'call_reason'       => 'Call Reason'            
+            'cb'                    => '<input type="checkbox" />', //Render a checkbox instead of text
+            'full_name'             => 'Requested Caller Name',
+            'mobile'                => 'Mobile #',
+            'requested_date_time'   => 'Call Date / Time',
+            'call_reason'           => 'Call Reason'
         );
         return $columns;
     }
     
     function get_sortable_columns(){
         $sortable_columns = array(
-            'full_name'         => array('full_name',true) //true means it's already sorted           
+            'full_name'         => array('full_name',true), //true means it's already sorted
+            'requested_date_time'         => array('requested_date',false) //true means it's already sorted
         );
         return $sortable_columns;
     }
@@ -104,10 +106,8 @@ class RC_CallMe_List_Table extends WP_List_Table {
         $orderby = (isset($_REQUEST['orderby']) && in_array($_REQUEST['orderby'], array_keys($this->get_sortable_columns()))) ? $_REQUEST['orderby'] : 'full_name';
         $order = (isset($_REQUEST['order']) && in_array($_REQUEST['order'], array('asc', 'desc'))) ? $_REQUEST['order'] : 'asc';
 
-        
         /* If the value is not NULL, do a search for it. */
         if( $search != NULL ){
-            
             // Trim and sanitize Search Term
             $search = trim($search) ;
             
@@ -152,12 +152,6 @@ if ($current_action !== 'delete' && $current_action !== 'edit') {
 if ($current_action === 'delete') {
     $message = "<div class='updated below-h2' id='message'><p>Item(s) successfully deleted.</p></div>";
 }
-
-// if ($current_action === 'edit') {
-//     // bring in the edit form
-//     $edit_path = plugins_url('/', __FILE__) . 'ringcentral-edit-subscribers.inc' ;    
-//     require_once($edit_path);
-// } else {
 ?>
     <h2>Call Me Requests</h2>   
     <?php echo $message; ?>             
@@ -169,6 +163,5 @@ if ($current_action === 'delete') {
     <!-- Now we can render the completed list table -->
     <?php $myListTable->display() ?>
 </form>
-<?php
-ringcentral_plugin_version () ;
-?>
+
+<?php ringcentral_plugin_version() ; ?>
