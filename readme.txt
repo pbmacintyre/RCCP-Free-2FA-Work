@@ -2,8 +2,8 @@
 Contributors:      pbmacintyre
 Tags:              Ring Central Communications API tools
 Requires at least: 6.3.0
-Tested up to:      6.6.0
-Stable tag:        1.6.1
+Tested up to:      6.7.0
+Stable tag:        1.6.5
 Requires PHP:      8.0.2
 License:           GPLv2 or later
 License URI:       https://www.gnu.org/licenses/gpl-2.0.html
@@ -131,6 +131,12 @@ use of this plug in, but currently you do need to have a developer account.
 = 1.6.1 =
 * Ensured compatability with WordPress 6.6.2
 * Added sortable date and time of call me request to admin listing of call me requests
+= 1.6.5 =
+* Ensured compatability with WordPress 6.7.0
+* Added control options for the embeddable communications tool
+* Removed RingCentral Sandbox environment option on plugin settings page
+* Updated help content in activation file / DB accordingly
+* Updated all copyright notices to included 2025
 
 == Upgrade Notice ==
 == Contribute ==

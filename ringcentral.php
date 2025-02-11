@@ -4,7 +4,7 @@ Plugin Name: RingCentral
 Plugin URI:  https://ringcentral.com
 Description: RingCentral Communications Plugin - FREE
 Author:      Peter MacIntyre
-Version:     1.6.1
+Version:     1.6.5
 Author URI:  https://paladin-bs.com/about
 Details URI: https://paladin-bs.com
 License:     GPL2
@@ -22,14 +22,14 @@ GNU General Public License for more details.
  
 See License URI for full details.
 
-Copyright (C) 2019-2024 Paladin Business Solutions
+Copyright (C) 2019-2025 Paladin Business Solutions
 */
 
 /* ============================== */
 /* Set RingCentral Constant values */
 /* ============================== */
 if (!defined('RINGCENTRAL_PLUGIN_VERSION')) {
-    define('RINGCENTRAL_PLUGIN_VERSION', "1.6.1");
+    define('RINGCENTRAL_PLUGIN_VERSION', "1.6.5");
 }
 if (!defined('RINGCENTRAL_PLUGINDIR')) {
     define('RINGCENTRAL_PLUGINDIR', plugin_dir_path(__FILE__));
@@ -268,9 +268,14 @@ function ringcentral_embed_phone () {
         FROM `ringcentral_control`
         WHERE `ringcentral_control_id` = %d", 1)
     );
-    if ($result_rc->embedded_phone == 1) { ?>
-        <script src="https://ringcentral.github.io/ringcentral-embeddable-voice/adapter.js"></script>
-    <?php }
+	if ($result_rc->embedded_phone == 1) {
+		// show_embeddable($result_rc->client_id);
+        $embed_url = "https://apps.ringcentral.com/integration/ringcentral-embeddable/latest/adapter.js?enablePopup=1&multipleTabsSupport=1";
+//      $embed_url .= "&disableContacts=true";
+        $embed_url .= "&disableGlip=false";
+        ?>
+        <script src=" <?= $embed_url ?>"></script>
+	<?php }
 }
 
 /* ================================== */

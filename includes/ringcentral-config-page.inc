@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (C) 2019-2024 Paladin Business Solutions
+ * Copyright (C) 2019-2025 Paladin Business Solutions
  *
  */
 
@@ -48,7 +48,8 @@ Function show_form($message, $label = "", $color = "#008EC2") {
 			<?php echo ringcentral_build_help("embedded_phone") ; ?>
 						
 		</td>
-		<td class="right_col"><input type="checkbox" name="embedded_phone" <?php 
+		<td class="right_col">
+            <input type="checkbox" name="embedded_phone" id="embedded" onclick="embedd_options()" <?php
 		if ($print_again) { 
 		    if ($_POST['embedded_phone'] == "on") {
 		      echo 'CHECKED';
@@ -60,6 +61,14 @@ Function show_form($message, $label = "", $color = "#008EC2") {
           }
             ?>></td>
 	</tr>
+    <tr class="TableOverride" id="embeddRow">
+        <td class="left_col">
+            Select the display options for the Embeddable phone
+        </td>
+        <td class="right_col">
+            some stuff here
+        </td>
+    </tr>
 	<tr class="TableOverride">
 		<td class="left_col">
 			<p style='display: inline; <?php if ($label == "email_updates") echo "color:red"; ?>' >Send Post Updates by eMail?</p>			
@@ -96,27 +105,6 @@ Function show_form($message, $label = "", $color = "#008EC2") {
         <td colspan=2>
             <hr>
         </td>
-    </tr>
-    <tr class="TableOverride">
-        <td class="left_col">
-            <p style='display: inline; <?php if ($label == "ringcentral_sandbox") echo "color:red"; ?>' >Use the RingCentral SANDBOX Environment?</p>
-            
-            <?php echo ringcentral_build_help("ringcentral_sandbox") ; ?>
-                      
-        </td>
-        <td class="right_col"><input type="checkbox" name="ringcentral_sandbox" <?php 
-        if ($print_again) {
-            if ($valid_sdk == 0) {
-                 echo ' ';
-            } else {
-                if ($_POST['ringcentral_sandbox'] == "on") { echo 'CHECKED'; }
-            }
-          } else {
-              if ($result_rc->ringcentral_sandbox  == 1) {
-                  echo 'CHECKED' ;
-                }
-          }
-            ?>></td>
     </tr>
 	<?php /* ============================================== */ ?>
     <tr class="TableOverride">

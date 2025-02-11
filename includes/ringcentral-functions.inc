@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (C) 2019-2024 Paladin Business Solutions
+ * Copyright (C) 2019-2025 Paladin Business Solutions
  *
  */
 
@@ -342,4 +342,46 @@ function ringcentral_admin_page_top () { ?>
 
 function ringcentral_plugin_version () {
     echo "<p style='font-size: small'> RCCP Free Version: " . RINGCENTRAL_PLUGIN_VERSION . "</p>";
-} ?>
+}
+function show_embeddable($client_id) {
+
+    /*  $server_URL = "https://apps.ringcentral.com/integration/ringcentral-embeddable/latest/app.html?" ;
+	$server_URL .= "clientId=$client_id&appServer=https://platform.ringcentral.com" ;
+
+    // Add on Team Messaging feature
+	$server_URL .= "&disableGlip=false";
+
+    // Turn off the Call placement (dialpad) feature
+    $server_URL .= "&disableCall=true";
+
+	// Turn off the Contacts feature
+    $server_URL .= "&disableContacts=true";
+
+//    echo_spaces("Server URL", $server_URL);   */
+	$server_URL = "https://apps.ringcentral.com/integration/ringcentral-embeddable/latest/adapter.js?enablePopup=1&multipleTabsSupport=1";
+	$server_URL .= "clientId=$client_id&appServer=https://platform.ringcentral.com" ;
+	$server_URL .= "&disableContacts=true";
+	$server_URL .= "&disableGlip=false";
+?>
+	<script>
+	(function() {
+		var rcs = document.createElement("script");
+		rcs.src = "<?= $server_URL; ?>";
+		var rcs0 = document.getElementsByTagName("script")[0];
+		rcs0.parentNode.insertBefore(rcs, rcs0);
+	})();
+	</script>
+
+    <?php
+    /* $iframe_width	= "550";  # default width
+    $iframe_height	= "530";  # default height
+
+	$iframe_string = "<iframe id='rc-widget' allow='microphone' ";
+	$iframe_string .= "width='$iframe_width' ";
+	$iframe_string .= "height='$iframe_height' ";
+	$iframe_string .= "src='$server_URL'";
+	$iframe_string .= " ></iframe>";
+
+    echo $iframe_string;  */
+}
+?>

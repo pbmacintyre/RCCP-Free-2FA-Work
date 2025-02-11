@@ -2,8 +2,8 @@
 <project version="4">
   <component name="WebServers">
     <option name="servers">
-      <webServer id="63937478-efcc-4160-b2b2-53c8b8fdb9f7" name="Finserv Blog Code" url="https://paladin-bs.com/finserv_blog">
-        <fileTransfer rootFolder="/public_html/finserv_blog" host="ftp.paladin-bs.com" port="21">
+      <webServer id="6ca73aab-b3e2-4ffc-8d7e-8da3fdc0a849" name="RingCentral WP Plugin Test on Paladin" url="http://ftp.paladin-bs.com">
+        <fileTransfer rootFolder="/ringcent/wp-content/plugins/rccp-free" host="ftp.paladin-bs.com" port="21">
           <advancedOptions>
             <advancedOptions dataProtectionLevel="Private" passiveMode="true" shareSSLContext="true" />
           </advancedOptions>

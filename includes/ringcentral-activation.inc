@@ -1,6 +1,6 @@
 <?php 
 /*
- * Copyright (C) 2019-2024 Paladin Business Solutions
+ * Copyright (C) 2019-2025 Paladin Business Solutions
  *
  */
 
@@ -14,6 +14,13 @@ require_once (ABSPATH . 'wp-admin/includes/upgrade.php');
 $ringcentral_sql = "CREATE TABLE `ringcentral_control` (
   `ringcentral_control_id` int(11) NOT NULL AUTO_INCREMENT,
   `embedded_phone` tinyint(4) NOT NULL,
+  `disable_glip` tinyint(4) NOT NULL,  
+  `enable_sms_template` tinyint(4) NOT NULL, 
+  `disable_calls` tinyint(4) NOT NULL, 
+  `disable_call_history` tinyint(4) NOT NULL,
+  `disable_contacts` tinyint(4) NOT NULL,
+  `disable_messages` tinyint(4) NOT NULL,
+  `disable_meetings` tinyint(4) NOT NULL,   
   `jwt_key` text NOT NULL,
   `webhook_token` VARCHAR(100) NULL,  
   `ringcentral_user_name` varchar(50) NOT NULL,  
@@ -122,11 +129,7 @@ if (!$row_exists) {
     $wpdb->query( $wpdb->prepare("INSERT INTO `ringcentral_help`
       (`ringcentral_help_id`, `ringcentral_help_field`, `ringcentral_help_help`)
       VALUES (%d, %s, %s)",
-        3, "ringcentral_sandbox", "Turn this checkbox ON if you want to use the RingCentral SANDBOX Environment, leave it off for Production use." ) );
-    $wpdb->query( $wpdb->prepare("INSERT INTO `ringcentral_help`
-      (`ringcentral_help_id`, `ringcentral_help_field`, `ringcentral_help_help`)
-      VALUES (%d, %s, %s)",
-    	4, "embedded_phone", "Use this checkbox to turn on the Embedded Phone tool." ) );
+    	3, "embedded_phone", "Use this checkbox to turn on the Embedded Phone tool." ) );
 }
 /* ======================================= */
 /* build email confirmation page if needed */

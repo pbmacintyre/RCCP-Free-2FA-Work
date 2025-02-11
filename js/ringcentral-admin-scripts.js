@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2021 - 2023 Paladin Business Solutions
+ * Copyright (C) 2021 - 2025 Paladin Business Solutions
  *
  */
 
@@ -24,6 +24,17 @@ function hide_it() {
 	}
 	if (z.type === "text") {
 	  z.type = "password";
+	}
+}
+
+function embedd_options() {
+	var checkbox = document.getElementById("embedded");
+	var tableRow = document.getElementById("embeddRow");
+
+	if (checkbox.checked) {
+		tableRow.style.display = "table-row"; // Show the row
+	} else {
+		tableRow.style.display = "none"; // Hide the row
 	}
 }
 
