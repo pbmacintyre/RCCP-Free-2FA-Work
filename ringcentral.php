@@ -264,15 +264,24 @@ add_action('admin_footer', 'ringcentral_embed_phone');
 /* =============================================== */
 function ringcentral_embed_phone () {
     global $wpdb;
-    $result_rc = $wpdb->get_row($wpdb->prepare("SELECT `embedded_phone` 
-        FROM `ringcentral_control`
+    $result_rc = $wpdb->get_row($wpdb->prepare("SELECT * FROM `ringcentral_control`
         WHERE `ringcentral_control_id` = %d", 1)
     );
 	if ($result_rc->embedded_phone == 1) {
-		// show_embeddable($result_rc->client_id);
+
         $embed_url = "https://apps.ringcentral.com/integration/ringcentral-embeddable/latest/adapter.js?enablePopup=1&multipleTabsSupport=1";
-//      $embed_url .= "&disableContacts=true";
-        $embed_url .= "&disableGlip=false";
+
+		$embed_url .= ($result_rc->disable_glip == 1) ? "&disableGlip=true" : "&disableGlip=false";
+		$embed_url .= ($result_rc->enable_sms_template == 1) ? "&enableSMSTemplate=1" : "";
+		$embed_url .= ($result_rc->disable_calls == 1) ? "&disableCall=true" : "";
+		$embed_url .= ($result_rc->disable_call_history == 1) ? "&disableCallHistory=true" : "";
+        $embed_url .= ($result_rc->disable_contacts == 1) ? "&disableContacts=true" : "";
+
+        $embed_url .= ($result_rc->disable_messages == 1) ? "&disableMessages=true" : "";
+        $embed_url .= ($result_rc->disable_meetings == 1) ? "&disableMeeting=true" : "";
+
+//        echo_spaces("Embed URL", $embed_url,4);
+
         ?>
         <script src=" <?= $embed_url ?>"></script>
 	<?php }

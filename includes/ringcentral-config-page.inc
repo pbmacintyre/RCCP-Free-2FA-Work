@@ -63,10 +63,118 @@ Function show_form($message, $label = "", $color = "#008EC2") {
 	</tr>
     <tr class="TableOverride" id="embeddRow">
         <td class="left_col">
-            Select the display options for the Embeddable phone
+            Manage the display options:
         </td>
         <td class="right_col">
-            some stuff here
+            <table  >
+                <tr class="inner_borders">
+                    <td class="inner_borders">
+                        Disable Team Messaging?
+                        <input type="checkbox" name="disable_glip" <?php
+						if ($print_again) {
+							if ($_POST['disable_glip'] == "on") {
+								echo 'CHECKED';
+							}
+						} else {
+							if ($result_rc->disable_glip == 1) {
+								echo 'CHECKED' ;
+							}
+						}
+						?>>
+                    </td>
+                    <td class="inner_borders">
+                        Enable SMS Template?
+                        <input type="checkbox" name="enable_sms_template" <?php
+						if ($print_again) {
+							if ($_POST['enable_sms_template'] == "on") {
+								echo 'CHECKED';
+							}
+						} else {
+							if ($result_rc->enable_sms_template == 1) {
+								echo 'CHECKED' ;
+							}
+						}
+						?>>
+                    </td>
+                </tr>
+                <tr class="inner_borders">
+                    <td class="inner_borders">
+                        Disable Calls?
+                        <input type="checkbox" name="disable_calls" <?php
+						if ($print_again) {
+							if ($_POST['disable_calls'] == "on") {
+								echo 'CHECKED';
+							}
+						} else {
+							if ($result_rc->disable_calls == 1) {
+								echo 'CHECKED' ;
+							}
+						}
+						?>>
+                    </td>
+                    <td class="inner_borders">
+                        Disable Call History?
+                        <input type="checkbox" name="disable_call_history" <?php
+						if ($print_again) {
+							if ($_POST['disable_call_history'] == "on") {
+								echo 'CHECKED';
+							}
+						} else {
+							if ($result_rc->disable_call_history == 1) {
+								echo 'CHECKED' ;
+							}
+						}
+						?>>
+                    </td>
+                </tr>
+                <tr class="inner_borders">
+                    <td class="inner_borders">
+                        Disable Contacts?
+                        <input type="checkbox" name="disable_contacts" <?php
+						if ($print_again) {
+							if ($_POST['disable_contacts'] == "on") {
+								echo 'CHECKED';
+							}
+						} else {
+							if ($result_rc->disable_contacts == 1) {
+								echo 'CHECKED' ;
+							}
+						}
+						?>>
+                    </td>
+                    <td class="inner_borders">
+                        Disable Voicemail Messages?
+                        <input type="checkbox" name="disable_messages" <?php
+						if ($print_again) {
+							if ($_POST['disable_messages'] == "on") {
+								echo 'CHECKED';
+							}
+						} else {
+							if ($result_rc->disable_messages == 1) {
+								echo 'CHECKED' ;
+							}
+						}
+						?>>
+                    </td>
+                </tr>
+                <tr class="inner_borders">
+                    <td class="inner_borders">
+                        Disable Video Meetings?
+                        <input type="checkbox" name="disable_meetings" <?php
+						if ($print_again) {
+							if ($_POST['disable_meetings'] == "on") {
+								echo 'CHECKED';
+							}
+						} else {
+							if ($result_rc->disable_meetings == 1) {
+								echo 'CHECKED' ;
+							}
+						}
+						?>>
+                    </td>
+                    <td class="inner_borders"> &nbsp; </td>
+                </tr>
+            </table>
         </td>
     </tr>
 	<tr class="TableOverride">
@@ -254,15 +362,8 @@ Function check_form() {
     $label = "" ;
 	$message = "" ;
 	
-	if ($_POST['ringcentral_sandbox'] == "on") {
-	    $sandbox = 1;
-	} else {
-	    $sandbox = 0;
-	}    
-	
 	$form_data = array(
 	    "jwt_key"          => sanitize_text_field($_POST['jwt_key']),
-	    "sandbox"          => $sandbox
 	);
     $givenPhone = sanitize_text_field( $_POST['ringcentral_user_name'] ) ;
 
@@ -283,16 +384,16 @@ Function check_form() {
 	    $message = "There was an error validating your RingCentral JWT key credentials, please verify and try again";
 	}
     /* =============================================================================== */
-    /* save JWT, SmsSender Phone number, and sandbox value to DB if they are validated */
+    /* save JWT, SmsSender Phone number to DB if validated */
     /* =============================================================================== */
     if (!$print_again) {
-        $jwt_sql = $wpdb->prepare("UPDATE `ringcentral_control` SET `jwt_key` = %s, `ringcentral_user_name` = %s, `ringcentral_sandbox` = %d
-            WHERE `ringcentral_control_id` = %d", $form_data['jwt_key'], $_POST['ringcentral_user_name'], $sandbox, 1);
+        $jwt_sql = $wpdb->prepare("UPDATE `ringcentral_control` SET `jwt_key` = %s, `ringcentral_user_name` = %s, 
+            WHERE `ringcentral_control_id` = %d", $form_data['jwt_key'], $_POST['ringcentral_user_name'], 1);
         $wpdb->query($jwt_sql);
     } else {
         // blank this data so old values are not kept
-        $jwt_sql = $wpdb->prepare("UPDATE `ringcentral_control` SET `jwt_key` = %s, `ringcentral_user_name` = %s, `ringcentral_sandbox` = %d
-            WHERE `ringcentral_control_id` = %d", "", "", "", 1);
+        $jwt_sql = $wpdb->prepare("UPDATE `ringcentral_control` SET `jwt_key` = %s, `ringcentral_user_name` = %s
+            WHERE `ringcentral_control_id` = %d", "", "", 1);
         $wpdb->query($jwt_sql);
     }
     /* =============================================================================== */
@@ -324,9 +425,24 @@ Function check_form() {
 	} else {	    
 	    /* convert and / or sanitize any needed form POST values */
 	    if ($_POST['embedded_phone'] == "on") { 
-	        $embedded_phone = 1;	        
-        } else {
+	        $embedded_phone = 1;
+			$disable_glip = ($_POST['disable_glip'] == "on") ? 1 : 0;
+			$enable_sms_template = ($_POST['enable_sms_template'] == "on") ? 1 : 0;
+			$disable_calls = ($_POST['disable_calls'] == "on") ? 1 : 0;
+			$disable_call_history = ($_POST['disable_call_history'] == "on") ? 1 : 0;
+			$disable_contacts = ($_POST['disable_contacts'] == "on") ? 1 : 0;
+			$disable_messages = ($_POST['disable_messages'] == "on") ? 1 : 0;
+			$disable_meetings = ($_POST['disable_meetings'] == "on") ? 1 : 0;
+		} else {
             $embedded_phone = 0;
+            // turn off all the sub controls for embeddable
+            $disable_glip = 0;
+            $enable_sms_template = 0;
+            $disable_calls = 0;
+            $disable_call_history = 0;
+            $disable_contacts = 0;
+            $disable_messages = 0;
+            $disable_meetings = 0;
         }
         if ($_POST['email_updates'] == "on") {
             $email_updates = 1;
@@ -344,12 +460,15 @@ Function check_form() {
         // pick up existing record before any changes are committed.
         $result_rc = $wpdb->get_row( $wpdb->prepare("SELECT * FROM `ringcentral_control` WHERE `ringcentral_control_id` = %d", 1) );
         
-        $config_sql = $wpdb->prepare("UPDATE `ringcentral_control` SET `jwt_key` = %s, `embedded_phone` = %d, `email_updates` = %d, `mobile_updates` = %d, 
-            `ringcentral_user_name` = %s, `ringcentral_sandbox` = %d, `grc_site_key` = %s, `grc_secret_key` = %s, `token_prefix` = %s
-            WHERE `ringcentral_control_id` = %d", $form_data['jwt_key'], $embedded_phone, $email_updates, $mobile_updates,
-            $_POST['ringcentral_user_name'], $sandbox, $GRCSite, $GRCSecret, $token_prefix, 1) ;
+        $config_sql = $wpdb->prepare("UPDATE `ringcentral_control` SET `jwt_key` = %s, `embedded_phone` = %d, 
+            `disable_glip` = %d, `enable_sms_template` = %d, `disable_calls` = %d, `disable_call_history` = %d,
+            `disable_contacts` = %d, `disable_messages` = %d, `disable_meetings` = %d, `email_updates` = %d, `mobile_updates` = %d, 
+            `ringcentral_user_name` = %s, `grc_site_key` = %s, `grc_secret_key` = %s, `token_prefix` = %s
+            WHERE `ringcentral_control_id` = %d", $form_data['jwt_key'], $embedded_phone,
+			$disable_glip, $enable_sms_template, $disable_calls, $disable_call_history, $disable_contacts, $disable_messages, $disable_meetings,
+            $email_updates, $mobile_updates, $_POST['ringcentral_user_name'], $GRCSite, $GRCSecret, $token_prefix, 1) ;
 
-        if($form_data['jwt_key'] != $result_rc->jwt_key || $sandbox != $result_rc->ringcentral_sandbox) {
+        if($form_data['jwt_key'] != $result_rc->jwt_key ) {
             if(!empty($result_rc->webhook_token)) {
                 // Make call to delete webhook
                 $sdk = ringcentral_sdk() ;
@@ -360,7 +479,7 @@ Function check_form() {
         $wpdb->query( $config_sql );
 
         // now re-create the webhook token for the new credentials
-        if($form_data['jwt_key'] != $result_rc->jwt_key || $sandbox != $result_rc->ringcentral_sandbox) {
+        if($form_data['jwt_key'] != $result_rc->jwt_key ) {
 
             // Create subscription
             // SDK should now be using any new credentials just saved to DB ~2 lines above

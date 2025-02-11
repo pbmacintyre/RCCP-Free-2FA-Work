@@ -2,6 +2,9 @@
  * Copyright (C) 2021 - 2025 Paladin Business Solutions
  *
  */
+window.onload = function() {
+	embedd_options();
+};
 
 function reveal_it() {
 	var y = document.getElementById("myGRCSite");    
