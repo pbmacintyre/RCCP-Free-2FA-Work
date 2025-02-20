@@ -35,7 +35,8 @@ into their own WordPress installations. This is controllable in the settings pag
 
 <ul>
 <li>RingCentral Embedded Phone app - 
-RingCentral's embedded phone app can be turned on or off and calls can be made from within the WordPress Admin area.
+RingCentral's embedded phone app can be turned on or off and calls can be made from within the WordPress Admin area. Sub-features
+can now be toggled on/off as desired.
 </li>
 
 <li>Call Me Request widget - 
@@ -110,7 +111,7 @@ use of this plug in, but currently you do need to have a developer account.
 13. SMS 2FA User profile editing page - part 2
 14. SMS 2FA User profile editing page - part 3
 15. 2FA challenge screen on admin login
-16. JWT Creation screen on RingCentral Developers consol
+16. JWT Creation screen on RingCentral Developers console
 17. JWT Code information after key creation
 
 == Changelog ==
@@ -137,6 +138,7 @@ use of this plug in, but currently you do need to have a developer account.
 * Removed RingCentral Sandbox environment option on plugin settings page
 * Updated help content in activation file / DB accordingly
 * Updated all copyright notices to included 2025
+* Updated User Guide and changed link to file within plugin title line
 
 == Upgrade Notice ==
 == Contribute ==
