@@ -46,6 +46,13 @@ if (!$row_exists) {
         array(
             'ringcentral_control_id' => 1,
             'embedded_phone' => 0,
+			'disable_glip' => 0,
+			'enable_sms_template' => 0,
+			'disable_calls' => 0,
+			'disable_call_history' => 0,
+			'disable_contacts' => 0,
+			'disable_messages' => 0,
+			'disable_meetings' => 0,
             'jwt_key' => "",
             'webhook_token' => "",
             'ringcentral_user_name' => "",
