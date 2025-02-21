@@ -3,7 +3,7 @@ Contributors:      pbmacintyre
 Tags:              Ring Central Communications API tools
 Requires at least: 6.3.0
 Tested up to:      6.7.0
-Stable tag:        1.6.5
+Stable tag:        1.6.6
 Requires PHP:      8.0.2
 License:           GPLv2 or later
 License URI:       https://www.gnu.org/licenses/gpl-2.0.html
@@ -139,6 +139,8 @@ use of this plug in, but currently you do need to have a developer account.
 * Updated help content in activation file / DB accordingly
 * Updated all copyright notices to included 2025
 * Updated User Guide and changed link to file within plugin title line
+= 1.6.6 =
+* Fixed wrong URL path to on-line User Guide
 
 == Upgrade Notice ==
 == Contribute ==
