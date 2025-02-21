@@ -4,7 +4,7 @@ Plugin Name: RingCentral
 Plugin URI:  https://ringcentral.com
 Description: RingCentral Communications Plugin - FREE
 Author:      Peter MacIntyre
-Version:     1.6.6
+Version:     1.6.8
 Author URI:  https://paladin-bs.com/about
 Details URI: https://paladin-bs.com
 License:     GPL2
@@ -29,7 +29,7 @@ Copyright (C) 2019-2025 Paladin Business Solutions
 /* Set RingCentral Constant values */
 /* ============================== */
 if (!defined('RINGCENTRAL_PLUGIN_VERSION')) {
-    define('RINGCENTRAL_PLUGIN_VERSION', "1.6.6");
+    define('RINGCENTRAL_PLUGIN_VERSION', "1.6.8");
 }
 if (!defined('RINGCENTRAL_PLUGINDIR')) {
     define('RINGCENTRAL_PLUGINDIR', plugin_dir_path(__FILE__));
@@ -610,7 +610,7 @@ add_filter('plugin_row_meta', 'ringcentral_add_plugin_links', 10, 2);
 //Add a link on the plugin control line after 'view details'
 function ringcentral_add_plugin_links($links, $file) {
     if ( $file == plugin_basename(dirname(__FILE__).'/ringcentral.php') ) {
-        $links[] = '<a href="https://paladin-bs.com/wp-content/uploads/2025/02/RingCentral_user_guide_1_6_6.pdf" target="_blank">' . esc_html__('User Guide', 'ringcentral') . '</a>';
+        $links[] = '<a href="https://paladin-bs.com/wp-content/uploads/2025/02/RingCentral_user_guide_1_6_8.pdf" target="_blank">' . esc_html__('User Guide', 'ringcentral') . '</a>';
     }
     return $links;
 }
