@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: RingCentral
-Plugin URI:  https://ringcentral.com
+Plugin URI:  https://paladin-bs.com
 Description: RingCentral Communications Plugin - FREE
 Author:      Peter MacIntyre
 Version:     1.6.8
