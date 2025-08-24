@@ -118,7 +118,7 @@ function ringcentral_gen_six_digit_code ($user, $login = 1) {
     // generate a random 6 digit code
     $six_digit_code = rand(100000, 999999);
     // put code in the session
-    $_SESSION['six_digit_code'] = $six_digit_code;
+    // $_SESSION['expected_six_digit_code'] = $six_digit_code;
     $website_name = get_option('blogname');
 
     if ($login == 0) {  // user profile edit page is being used
@@ -131,6 +131,7 @@ function ringcentral_gen_six_digit_code ($user, $login = 1) {
     if ($login == 1) { // wp-dmin login form is being used
         // make sure fresh code is 0
         update_user_meta($user, 'RingCentral_2fa_fresh_code_sent', 0);
+        update_user_meta($user, 'RingCentral_2fa_user_2fa_code', $six_digit_code);
         $message = "\nTo continue your login for '$website_name' use the following six-digit code. We will never call or email for this code: $six_digit_code";
     }
 
@@ -152,7 +153,7 @@ function ringcentral_gen_six_digit_code ($user, $login = 1) {
         // Getting error messages using PHP native interface
         // $message = "Unable to authenticate to platform. Check credentials. " . $e->message . PHP_EOL);
         // craft a friendly message here.
-        $return_message = "There was an error sending the validation code, Please try again later <br/>" . $e ;
+        $return_message = "There was an error sending the validation code, Please try again later <br/>" . $e->getMessage();
         echo_spaces("Catch message", $return_message) ;
     }
 }
@@ -279,7 +280,7 @@ function ringcentral_2fa_edit_profile ($selected_user_obj) { ?>
 
     /* =============================================================================== */
 
-    // pick up form submitted pin from query string
+    // pick up form user entered / submitted pin from query string
     $mfapin =  preg_replace('/[^0-9]/', '', $_GET['MFAPIN'] );
 
     if ($mfapin) {
@@ -329,6 +330,7 @@ function ringcentral_2fa_edit_profile ($selected_user_obj) { ?>
             <th>
                 <p id="TwoFAAnchor"></p>
                 <label for='RingCentral_2fa_user_enabled'>Turn on 2FA ?</label></th>
+            <?php // echo_spaces("Session", $_SESSION); ?>
             <td>
                 <?php if ($selected_user_access_lvl == "administrator") { ?>
                     <input id="TwoFAEnabledAdmin" type='checkbox' name='RingCentral_2fa_user_enabled' <?php echo $checkedString; ?> value='<?php echo $enabled; ?>' />

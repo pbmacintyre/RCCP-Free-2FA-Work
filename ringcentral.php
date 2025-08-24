@@ -4,7 +4,7 @@ Plugin Name: RingCentral
 Plugin URI:  https://paladin-bs.com
 Description: RingCentral Communications Plugin - FREE
 Author:      Peter MacIntyre
-Version:     1.6.8
+Version:     1.7.0
 Author URI:  https://paladin-bs.com/about
 Details URI: https://paladin-bs.com
 License:     GPL2
@@ -29,7 +29,7 @@ Copyright (C) 2019-2025 Paladin Business Solutions
 /* Set RingCentral Constant values */
 /* ============================== */
 if (!defined('RINGCENTRAL_PLUGIN_VERSION')) {
-    define('RINGCENTRAL_PLUGIN_VERSION', "1.6.8");
+    define('RINGCENTRAL_PLUGIN_VERSION', "1.7.0");
 }
 if (!defined('RINGCENTRAL_PLUGINDIR')) {
     define('RINGCENTRAL_PLUGINDIR', plugin_dir_path(__FILE__));
@@ -71,24 +71,24 @@ require_once("includes/ringcentral-2fa-functions.inc");
 /* ================================= */
 /* set RingCentral supporting cast  */
 /* ================================= */
-function ringcentral_js_add_script () {
+function ringcentral_js_add_script() {
     $js_path = RINGCENTRAL_PLUGINURL . 'js/ringcentral-scripts.js';
     wp_enqueue_script('ringcentral-js', $js_path);
 }
 
 add_action('init', 'ringcentral_js_add_script');
 
-function ringcentral_js_add_admin_script () {
+function ringcentral_js_add_admin_script() {
     $js_path = RINGCENTRAL_PLUGINURL . 'js/ringcentral-admin-scripts.js';
     wp_enqueue_script('ringcentral-admin-js', $js_path);
 }
 
 add_action('admin_enqueue_scripts', 'ringcentral_js_add_admin_script');
 
-function ringcentral_load_custom_admin_css () {
+function ringcentral_load_custom_admin_css() {
     wp_register_style('ringcentral_custom_admin_css',
-        RINGCENTRAL_PLUGINURL . 'css/ringcentral-custom.css',
-        false, '1.0.0');
+            RINGCENTRAL_PLUGINURL . 'css/ringcentral-custom.css',
+            false, '1.0.0');
     wp_enqueue_style('ringcentral_custom_admin_css');
 }
 
@@ -97,46 +97,46 @@ add_action('admin_print_styles', 'ringcentral_load_custom_admin_css');
 /* ========================================= */
 /* Make top level menu                       */
 /* ========================================= */
-function ringcentral_menu () {
+function ringcentral_menu() {
     add_menu_page(
-        'RingCentral: Configurations',    // Page & tab title
-        'RingCentral',                                // Menu title
-        'manage_options',                           // Capability option
-        'ringcentral_Admin',                        // Menu slug
-        'ringcentral_config_page',                  // menu destination function call
-        RINGCENTRAL_PLUGINURL . 'images/rc_logo_20_20.jpg', // menu icon path
-        25                                       // menu position level
+            'RingCentral: Configurations',    // Page & tab title
+            'RingCentral',                                // Menu title
+            'manage_options',                           // Capability option
+            'ringcentral_Admin',                        // Menu slug
+            'ringcentral_config_page',                  // menu destination function call
+            RINGCENTRAL_PLUGINURL . 'images/rc_logo_20_20.jpg', // menu icon path
+            25                                       // menu position level
     );
     add_submenu_page(
-        'ringcentral_Admin',                   // parent slug
-        'RingCentral: Configurations', // page title
-        'Settings',                            // menu title - can be different than parent
-        'manage_options',                      // options
-        'ringcentral_Admin'                    // menu slug to match top level (go to the same link)
+            'ringcentral_Admin',                   // parent slug
+            'RingCentral: Configurations', // page title
+            'Settings',                            // menu title - can be different than parent
+            'manage_options',                      // options
+            'ringcentral_Admin'                    // menu slug to match top level (go to the same link)
     );
     add_submenu_page(
-        'ringcentral_Admin',                // parent menu slug
-        'RingCentral: Add a New Subscriber', // page title
-        'Add Subscribers',                  // menu title
-        'manage_options',                   // capability
-        'ringcentral_add_subs',             // menu slug
-        'ringcentral_add_subscribers'       // callable function
+            'ringcentral_Admin',                // parent menu slug
+            'RingCentral: Add a New Subscriber', // page title
+            'Add Subscribers',                  // menu title
+            'manage_options',                   // capability
+            'ringcentral_add_subs',             // menu slug
+            'ringcentral_add_subscribers'       // callable function
     );
     add_submenu_page(
-        'ringcentral_Admin',                   // parent menu slug
-        'RingCentral: Manage Subscribers', // page title
-        'List Subscribers',                    // menu title
-        'manage_options',                      // capability
-        'ringcentral_list_subs',               // menu slug
-        'ringCentral_list_subscribers'         // callable function
+            'ringcentral_Admin',                   // parent menu slug
+            'RingCentral: Manage Subscribers', // page title
+            'List Subscribers',                    // menu title
+            'manage_options',                      // capability
+            'ringcentral_list_subs',               // menu slug
+            'ringCentral_list_subscribers'         // callable function
     );
     add_submenu_page(
-        'ringcentral_Admin',                // parent menu slug
-        'RingCentral: CallMe Requests', // page title
-        'Call Me Requests',                 // menu title
-        'manage_options',                   // capability
-        'ringcentral_list_callme',          // menu slug
-        'ringCentral_list_callme_requests'  // callable function
+            'ringcentral_Admin',                // parent menu slug
+            'RingCentral: CallMe Requests', // page title
+            'Call Me Requests',                 // menu title
+            'manage_options',                   // capability
+            'ringcentral_list_callme',          // menu slug
+            'ringCentral_list_callme_requests'  // callable function
     );
 //    add_submenu_page(
 //        'ringcentral_Admin',                // parent menu slug
@@ -164,14 +164,14 @@ function ringcentral_menu () {
 add_action('admin_menu', 'ringcentral_menu');
 
 // function for default Admin page
-function ringcentral_config_page () {
+function ringcentral_config_page() {
     // check user capabilities
     if (!current_user_can('manage_options')) {
         return;
     }
     ?>
     <div class="wrap">
-<?php   ringcentral_admin_page_top();
+        <?php ringcentral_admin_page_top();
         require_once(RINGCENTRAL_PLUGINDIR . "includes/ringcentral-config-page.inc"); ?>
 
     </div>
@@ -179,14 +179,14 @@ function ringcentral_config_page () {
 }
 
 // function for adding new subscribers page
-function ringcentral_add_subscribers () {
+function ringcentral_add_subscribers() {
     // check user capabilities
     if (!current_user_can('manage_options')) {
         return;
     }
     ?>
     <div class="wrap">
-<?php   ringcentral_admin_page_top();
+        <?php ringcentral_admin_page_top();
         require_once(RINGCENTRAL_PLUGINDIR . "includes/ringcentral-add-subscribers.inc"); ?>
 
     </div>
@@ -194,14 +194,14 @@ function ringcentral_add_subscribers () {
 }
 
 // function for editing existing subscribers page
-function ringCentral_list_subscribers () {
+function ringCentral_list_subscribers() {
     // check user capabilities
     if (!current_user_can('manage_options')) {
         return;
     }
     ?>
     <div class="wrap">
-<?php   ringcentral_admin_page_top();
+        <?php ringcentral_admin_page_top();
         require_once(RINGCENTRAL_PLUGINDIR . "includes/ringcentral-list-subscribers.inc"); ?>
 
     </div>
@@ -209,14 +209,14 @@ function ringCentral_list_subscribers () {
 }
 
 // function for editing existing subscribers page
-function ringCentral_list_callme_requests () {
+function ringCentral_list_callme_requests() {
     // check user capabilities
     if (!current_user_can('manage_options')) {
         return;
     }
     ?>
     <div class="wrap">
-<?php   ringcentral_admin_page_top();
+        <?php ringcentral_admin_page_top();
         require_once(RINGCENTRAL_PLUGINDIR . "includes/ringcentral-list-callme.inc"); ?>
 
     </div>
@@ -224,14 +224,14 @@ function ringCentral_list_callme_requests () {
 }
 
 // function for calling GLIP send
-function ringcentral_glip_send () {
+function ringcentral_glip_send() {
     // check user capabilities
     if (!current_user_can('manage_options')) {
         return;
     }
     ?>
     <div class="wrap">
-<?php   ringcentral_admin_page_top();
+        <?php ringcentral_admin_page_top();
         require_once(RINGCENTRAL_PLUGINDIR . "includes/ringcentral-glip.inc"); ?>
 
     </div>
@@ -239,14 +239,14 @@ function ringcentral_glip_send () {
 }
 
 // function for calling GLIP Embed settings page
-function ringcentral_glip_embed () {
+function ringcentral_glip_embed() {
     // check user capabilities
     if (!current_user_can('manage_options')) {
         return;
     }
     ?>
     <div class="wrap">
-<?php   ringcentral_admin_page_top();
+        <?php ringcentral_admin_page_top();
         require_once(RINGCENTRAL_PLUGINDIR . "includes/ringcentral-glip-embed.inc"); ?>
 
     </div>
@@ -262,29 +262,27 @@ add_action('admin_footer', 'ringcentral_embed_phone');
 /* Add custom footer action                        */
 /* This toggles the ringcentral Embedded Phone app */
 /* =============================================== */
-function ringcentral_embed_phone () {
+function ringcentral_embed_phone() {
     global $wpdb;
     $result_rc = $wpdb->get_row($wpdb->prepare("SELECT * FROM `ringcentral_control`
         WHERE `ringcentral_control_id` = %d", 1)
     );
-	if ($result_rc->embedded_phone == 1) {
+    if ($result_rc->embedded_phone == 1) {
 
         $embed_url = "https://apps.ringcentral.com/integration/ringcentral-embeddable/latest/adapter.js?enablePopup=1&multipleTabsSupport=1";
 
-		$embed_url .= ($result_rc->disable_glip == 1) ? "&disableGlip=true" : "&disableGlip=false";
-		$embed_url .= ($result_rc->enable_sms_template == 1) ? "&enableSMSTemplate=1" : "";
-		$embed_url .= ($result_rc->disable_calls == 1) ? "&disableCall=true" : "";
-		$embed_url .= ($result_rc->disable_call_history == 1) ? "&disableCallHistory=true" : "";
+        $embed_url .= ($result_rc->disable_glip == 1) ? "&disableGlip=true" : "&disableGlip=false";
+        $embed_url .= ($result_rc->enable_sms_template == 1) ? "&enableSMSTemplate=1" : "";
+        $embed_url .= ($result_rc->disable_calls == 1) ? "&disableCall=true" : "";
+        $embed_url .= ($result_rc->disable_call_history == 1) ? "&disableCallHistory=true" : "";
         $embed_url .= ($result_rc->disable_contacts == 1) ? "&disableContacts=true" : "";
 
         $embed_url .= ($result_rc->disable_messages == 1) ? "&disableMessages=true" : "";
         $embed_url .= ($result_rc->disable_meetings == 1) ? "&disableMeeting=true" : "";
 
-//        echo_spaces("Embed URL", $embed_url,4);
-
         ?>
         <script src=" <?= $embed_url ?>"></script>
-	<?php }
+    <?php }
 }
 
 /* ================================== */
@@ -296,7 +294,7 @@ add_action('widgets_init', 'ringcentral_register_contacts_widget');
 /* Add contacts widget function                   */
 /* This registers the ringcentral_contacts_widget */
 /* ============================================== */
-function ringcentral_register_contacts_widget () {
+function ringcentral_register_contacts_widget() {
     register_widget('ringcentral_contacts_widget');
 }
 
@@ -311,7 +309,7 @@ add_action('widgets_init', 'ringcentral_register_callme_widget');
 /* Add Call Me widget function                  */
 /* This registers the ringcentral_callme_widget */
 /* ============================================ */
-function ringcentral_register_callme_widget () {
+function ringcentral_register_callme_widget() {
     register_widget('ringcentral_callme_widget');
 }
 
@@ -323,7 +321,7 @@ require_once(RINGCENTRAL_PLUGINDIR . "includes/ringcentral-callme-widget.inc");
 add_action('pending_to_publish', 'ringcentral_new_post_set_queue');
 add_action('draft_to_publish', 'ringcentral_new_post_set_queue');
 
-function ringcentral_new_post_set_queue ($post) {
+function ringcentral_new_post_set_queue($post) {
     global $wpdb;
 
     if (wp_is_post_revision($post->ID) || get_post_type($post->ID) !== 'post') {
@@ -341,16 +339,16 @@ function ringcentral_new_post_set_queue ($post) {
 /* ============================================== */
 /* Setup CRON to do SMS messages and emails .     */
 /* ============================================== */
-function ringcentral_cron_schedules ($schedules) {
+function ringcentral_cron_schedules($schedules) {
     if (!isset($schedules["5min"])) {
         $schedules["5min"] = array(
-            'interval' => 5 * 60,
-            'display' => __('Once every 5 minutes'));
+                'interval' => 5 * 60,
+                'display' => __('Once every 5 minutes'));
     }
     if (!isset($schedules["30min"])) {
         $schedules["30min"] = array(
-            'interval' => 30 * 60,
-            'display' => __('Once every 30 minutes'));
+                'interval' => 30 * 60,
+                'display' => __('Once every 30 minutes'));
     }
     return $schedules;
 }
@@ -363,7 +361,7 @@ if (!wp_next_scheduled('ringcentral_send_notifications')) {
 
 add_action('ringcentral_send_notifications', 'ringcentral_check_queue');
 
-function ringcentral_check_queue () {
+function ringcentral_check_queue() {
     global $wpdb;
 
     $result_queue = $wpdb->get_row($wpdb->prepare("SELECT `ringcentral_queue_id` AS `id`, 
@@ -398,7 +396,7 @@ function ringcentral_check_queue () {
 /* ================================= */
 /* Add filter hook for subscriptions */
 /* ================================= */
-function ringcentral_vars ($vars) {
+function ringcentral_vars($vars) {
     $vars[] = 'rcsubscribe';
     $vars[] = 'rcunsubscribe';
     $vars[] = 'rcformat';
@@ -409,7 +407,7 @@ function ringcentral_vars ($vars) {
 
 add_filter('query_vars', 'ringcentral_vars');
 
-function ringcentral_handle_vars () {
+function ringcentral_handle_vars() {
     global $wpdb;
     $subscribe = get_query_var('rcsubscribe');
     $unsubscribe = get_query_var('rcunsubscribe');
@@ -432,14 +430,14 @@ add_action('parse_query', 'ringcentral_handle_vars');
 /* ============================================= */
 /* Add registration hook for plugin installation */
 /* ============================================= */
-function ringcentral_install () {
+function ringcentral_install() {
     require_once(RINGCENTRAL_PLUGINDIR . "includes/ringcentral-install.inc");
 }
 
 /* ========================================= */
 /* Create default pages on plugin activation */
 /* ========================================= */
-function ringcentral_install_default_pages () {
+function ringcentral_install_default_pages() {
     require_once(RINGCENTRAL_PLUGINDIR . "includes/ringcentral-activation.inc");
 }
 
@@ -466,157 +464,96 @@ register_activation_hook(__FILE__, 'ringcentral_install_default_pages');
 //}
 
 // function for sending out 6 digit authorization code to admin for login validation
-function RingCentral_2fa_intercept ($user, $username, $password) {
+function RingCentral_2fa_intercept($user, $username, $password) {
 
-    if (!session_id()) {
-        session_start();
+    if (is_wp_error($user) || empty($username)) {
+        return $user;
     }
 
-    // should we test the password too ?
-    $wpUser = get_user_by('login', $username);
+    // Only handle initial login (not our 2FA form submission)
+    if (!isset($_POST['RC_Validate_submit'])) {
+        // generate + send the PIN
+        ringcentral_gen_six_digit_code($user->ID);
 
-    // put $wpUser into the session ?
-    $_SESSION['wpUser'] = $wpUser;
-    // check that the user is 2FA enabled in their user account data
-    $mobile_validated = get_user_meta($wpUser->ID, 'RingCentral_2fa_user_mobile_validated', true);
-    if (!$mobile_validated) {
-        return;
+        // Show the custom 2FA form instead of continuing login
+        ringcentral_render_2fa_form($user);
+        exit;
     }
 
-    $redirect_to = isset($_POST['redirect_to']) ? sanitize_url($_POST['redirect_to']) : admin_url();
-
-    // will be used in the verify function to see a user login cookie TTD
-    $remember_me = isset($_POST['remember_me']) && $_POST['remember_me'] === 'forever';
-
-    if ($wpUser) {
-        ringcentral_admin_login_2fa_verify($wpUser, $redirect_to, $remember_me);
-    }
-
+    // if RC_Validate_submit is set, let WordPress continue normally
     return $user;
 }
 
-function ringcentral_admin_login_2fa_verify ($wpUser, $redirect_to, $remember_me) {
+function ringcentral_handle_2fa_submit() {
     if (isset($_POST['RC_Validate_submit'])) {
-        // the validation code form was submitted
-        // 6 digit code was sent... and form was submitted with user response.
-        // check that the sent validation code matches the session value
-        if ($_POST['ringcentral_2fa_code'] == $_POST['validation_code']) {
-            $errors = [];
-            wp_set_auth_cookie($wpUser->ID, $remember_me);
-            wp_safe_redirect($redirect_to);
+        $username = $_POST['log'] ?? '';
+        $enteredPIN = $_POST['entered_2fa_code'] ?? '';
+
+        $user = get_user_by('login', $username);
+        if (!$user) {
+            return;
+        }
+
+        $sms_sentPIN = get_user_meta($user->ID, 'RingCentral_2fa_user_2fa_code', true);
+
+        if ($enteredPIN == $sms_sentPIN) {
+            // success: log in
+            $remember = !empty($_POST['remember_me']) && $_POST['remember_me'] === 'forever';
+            wp_set_auth_cookie($user->ID, $remember);
+            wp_safe_redirect($_POST['redirect_to'] ?? admin_url());
             exit;
         } else {
-            $errors[] = "Invalid 2FA Validation code";
+            // fail → redisplay form with error
+            ringcentral_render_2fa_form($user, ['Invalid 2FA Validation code']);
+            exit;
         }
-    } else {
-        // this is the first time the form is being displayed (later in this function)
-        ringcentral_gen_six_digit_code($wpUser->ID);
     }
-    ?>
-    <style>
-        <!--
-        #buttonControl {
-            float: none !important;
-        }
-        .center_2fa {
-            /* border: #990000 solid 1px; */
-            text-align: center;
-        }
-        /* Chrome, Safari, Edge, Opera */
-        input::-webkit-outer-spin-button,
-        input::-webkit-inner-spin-button {
-            -webkit-appearance: none;
-            margin: 0;
-        }
-        /* Firefox */
-        input[type=number] {
-            -moz-appearance: textfield;
-        }
-        -->
-    </style>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
-    <script>
-        $(document).ready(function(){
-            $('#v-code').fadeIn(3000);
-        });
-    </script>
-    <?php
-    // create a unique token code to ensure the same process is happening
-    $generated_token = rand(1, 9999999);
-    $_SESSION['RingCentral_session_token'] = $generated_token;
-    $post_token = $generated_token;
+}
 
+function ringcentral_render_2fa_form($wpUser, $errors = []) {
     // Phone partial
-    $phone_number = trim(get_user_meta($wpUser->ID, 'RingCentral_2fa_user_mobile', true) );
+    $phone_number = trim(get_user_meta($wpUser->ID, 'RingCentral_2fa_user_mobile', true));
     $phone_partial = substr($phone_number, -4);
 
-//    wp_logout();
-//    nocache_headers();
-//    header('Content-Type: ' . get_bloginfo('html_type') . '; charset=' . get_bloginfo('charset'));
-
+    login_header('RingCentral 2FA',
+            empty($errors)
+                    ? '<p class="message">' . sprintf('We have sent you a 6 digit
+                validation code to the number we have on file ending in <strong>%1$s</strong>', $phone_partial) . '</p>'
+                    : '<div id="login_error">' . esc_html(implode('<br />', $errors)) . '</div>'
+    );
     ?>
-    <div class="center_2fa">
+    <div style="display: flex; justify-content: center; align-items: center; flex-direction: column;">
+        <form method="post" action="<?php echo esc_url(site_url('wp-login.php', 'login_post')); ?>"
+              style="text-align: center; max-width: 300px; width: 100%;">
+            <p>
+                <label for="entered_2fa_code">Enter the validation code:</label><br/><br/>
+                <input type="number" name="entered_2fa_code" size="6"/>
 
-        <?php if (empty($errors)) {
-
-            login_header('RingCentral', '<p class="message">' . sprintf('We have sent you a 6 digit
-                validation code to the number we have on file ending in <strong>%1$s</strong>', $phone_partial) . '</p>');
-            ?>
-            <form name="loginform" id="loginform"
-                  action="<?php echo esc_url(site_url('wp-login.php', 'login_post')) ?>"
-                  method="post" autocomplete="off">
-
-                <p>
-                    <label for="ringcentral_2fa_code">Enter the validation code:
-                        <br/> <br/>
-                        <input type="number" name="ringcentral_2fa_code" value="" size="6"/>
-                    </label>
-                </p>
-                <br/>
-                <p>
-                    <input type="submit" name="RC_Validate_submit" id="buttonControl"
-                           class="button button-primary button-large" value="Validate Code"/>
-
-                    <input type="hidden" name="validation_code" value="<?php echo $_SESSION['six_digit_code']; ?>">
-                    <input type="hidden" name="log" value="<?php echo esc_attr($wpUser->user_login); ?>">
-                    <input type="hidden" name="ringcentral_post_token" value="<?php echo esc_attr($post_token); ?>"/>
-                    <input type="hidden" name="redirect_to" value="<?php echo esc_attr($redirect_to); ?>">
-
-                    <?php if ($remember_me) { ?>
-                        <input type="hidden" name="remember_me" value="forever"/>
-                    <?php } ?>
-                </p>
-            </form>
-        <?php }
-        if (!empty($errors)) {
-           login_header('RingCentral', '<p> </p>');
-            ?>
-            <div id="login_error"><?php echo esc_html(implode('<br />', $errors)) ?></div>
-            <div class="message" id="v-code" style="display: none;">
-                <?php $websiteURL = get_site_url(null, null, 'https') . "/wp-admin" ; ?>
-                <a href="<?php echo $websiteURL; ?>">Click here to re-start the login process.
-                    <br/>You will be sent another code.</a>
-            </div>
-
-        <?php }
-        // login_footer();
-        exit; ?>
+                <input type="submit" name="RC_Validate_submit" class="button button-primary" value="Validate Code"/>
+                <input type="hidden" name="log" value="<?php echo esc_attr($wpUser->user_login); ?>"/>
+                <input type="hidden" name="redirect_to" value="<?php echo esc_attr(admin_url()); ?>"/>
+                <?php if (!empty($_POST['remember_me'])) { ?>
+                    <input type="hidden" name="remember_me" value="forever"/>
+                <?php } ?>
+            </p>
+        </form>
     </div>
     <?php
+    login_footer();
 }
 
 add_filter('plugin_row_meta', 'ringcentral_add_plugin_links', 10, 2);
 
 //Add a link on the plugin control line after 'view details'
 function ringcentral_add_plugin_links($links, $file) {
-    if ( $file == plugin_basename(dirname(__FILE__).'/ringcentral.php') ) {
+    if ($file == plugin_basename(dirname(__FILE__) . '/ringcentral.php')) {
         $links[] = '<a href="https://paladin-bs.com/wp-content/uploads/2025/02/RingCentral_user_guide_1_6_8.pdf" target="_blank">' . esc_html__('User Guide', 'ringcentral') . '</a>';
     }
     return $links;
 }
 
-
-add_action('authenticate', 'RingCentral_2fa_intercept', 10, 3);
+add_filter('authenticate', 'RingCentral_2fa_intercept', 30, 3);
+add_action('login_init', 'ringcentral_handle_2fa_submit');
 
 add_action('show_user_profile', 'ringcentral_2fa_user_settings');  // other users
 add_action('edit_user_profile', 'ringcentral_2fa_user_settings');   // your own profile

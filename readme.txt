@@ -2,8 +2,8 @@
 Contributors:      pbmacintyre
 Tags:              Ring Central Communications API tools
 Requires at least: 6.3.0
-Tested up to:      6.7.0
-Stable tag:        1.6.8
+Tested up to:      6.8.2
+Stable tag:        1.7.0
 Requires PHP:      8.0.2
 License:           GPLv2 or later
 License URI:       https://www.gnu.org/licenses/gpl-2.0.html
@@ -143,6 +143,11 @@ use of this plug in, but currently you do need to have a developer account.
 * Fixed wrong URL path to on-line User Guide
 = 1.6.8 =
 * Updated version number throughout plugin
+= 1.7.0 =
+* Fixed login vulnerability as reported by WordFence: Root cause of the vulnerability - the 2FA code on the server
+is not persistent (e.g. in $_SESSION or user meta) and instead two POST fields, fully under attacker control,
+are compared. The vulnerable code was introduced in version 1.5 and is still present in version 1.6.8
+* Corrected false positive of password check on login intercept process.
 
 == Upgrade Notice ==
 == Contribute ==
